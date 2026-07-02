@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>BUILT Compass</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="" />
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Barlow:wght@400;500;600&family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&family=Hanken+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<style>
+  :root{ --green:#6dd441; --green-deep:#2f7d2e; --coral:#d8553f; }
+  *{box-sizing:border-box;}
+  html,body{margin:0;min-height:100vh;font-family:'Hanken Grotesk',system-ui,sans-serif;background:#0b0d0b;color:#fff;overflow-x:hidden;}
+  a{text-decoration:none;color:inherit;}
+  button{font-family:inherit;cursor:pointer;}
+
+  .top{position:fixed;top:0;left:0;right:0;z-index:30;display:flex;align-items:center;justify-content:space-between;
+    padding:16px 26px;mix-blend-mode:difference;}
+  .brand{display:flex;align-items:center;gap:12px;}
+  .mark{width:32px;height:32px;background:var(--green);position:relative;flex:none;
+    clip-path:polygon(0 0,100% 0,100% 70%,70% 100%,0 100%);}
+  .mark::after{content:"";position:absolute;inset:8px;background:#0b0d0b;clip-path:polygon(0 0,100% 0,100% 60%,60% 100%,0 100%);}
+  .brand b{font-family:'Barlow Condensed';font-weight:700;font-size:21px;letter-spacing:.05em;color:#fff;}
+  .helpbtn{display:flex;align-items:center;gap:8px;background:var(--coral);color:#fff;border:none;
+    padding:9px 16px;border-radius:40px;font-weight:600;font-size:14px;mix-blend-mode:normal;}
+  .helpbtn .pulse{width:7px;height:7px;border-radius:50%;background:#fff;animation:pulse 1.9s infinite;}
+  @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(255,255,255,.7);}70%{box-shadow:0 0 0 7px rgba(255,255,255,0);}100%{box-shadow:0 0 0 0 rgba(255,255,255,0);}}
+
+  .intro{position:relative;z-index:5;text-align:center;padding:120px 24px 40px;max-width:880px;margin:0 auto;}
+  .kicker{font-family:'JetBrains Mono';font-size:12px;letter-spacing:.3em;color:var(--green);text-transform:uppercase;margin-bottom:18px;}
+  .intro h1{font-family:'Barlow Condensed';font-weight:700;text-transform:uppercase;font-size:clamp(38px,6.5vw,76px);
+    line-height:.95;margin:0 0 18px;letter-spacing:.01em;}
+  .intro h1 .g{color:var(--green);}
+  .intro p{color:#b9c0b6;font-size:17px;line-height:1.6;max-width:600px;margin:0 auto;}
+  .intro .note{margin-top:22px;font-family:'JetBrains Mono';font-size:11.5px;letter-spacing:.18em;color:#6b736a;text-transform:uppercase;}
+
+  .split{display:grid;grid-template-columns:1fr 1fr;min-height:560px;gap:0;}
+  .panel{position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:flex-end;
+    padding:48px;min-height:560px;transition:flex .4s;}
+  .panel .eyebrow{font-size:12px;letter-spacing:.26em;text-transform:uppercase;margin-bottom:14px;font-weight:600;}
+  .panel h2{font-size:clamp(34px,4vw,52px);line-height:.98;margin:0 0 14px;}
+  .panel p{font-size:15.5px;line-height:1.55;max-width:380px;margin:0 0 26px;}
+  .enter{display:inline-flex;align-items:center;gap:10px;font-weight:700;font-size:16px;
+    padding:13px 24px;border-radius:2px;transition:gap .25s,transform .25s;width:fit-content;}
+  .panel:hover .enter{gap:18px;}
+  .tag{position:absolute;top:48px;left:48px;font-family:'JetBrains Mono';font-size:11px;letter-spacing:.2em;opacity:.7;}
+
+  /* FIELD panel */
+  .field{background:#101310;color:#eef2ec;}
+  .field::before{content:"";position:absolute;inset:0;opacity:.5;
+    background:
+      linear-gradient(180deg,transparent 40%,rgba(16,19,16,.95)),
+      repeating-linear-gradient(0deg,transparent 0 38px,rgba(109,212,65,.05) 38px 39px),
+      repeating-linear-gradient(90deg,transparent 0 38px,rgba(109,212,65,.05) 38px 39px);}
+  .field .stripes{position:absolute;top:0;left:0;right:0;height:6px;
+    background:repeating-linear-gradient(135deg,var(--green) 0 14px,#101310 14px 28px);}
+  .field .eyebrow{color:var(--green);font-family:'JetBrains Mono';}
+  .field h2{font-family:'Barlow Condensed';font-weight:700;text-transform:uppercase;letter-spacing:.01em;}
+  .field p{color:#9aa297;}
+  .field .enter{background:var(--green);color:#101310;font-family:'Barlow Condensed';text-transform:uppercase;letter-spacing:.05em;}
+  .field .content{position:relative;z-index:2;}
+
+  /* HOMEBASE panel */
+  .home{background:#f6f3ec;color:#22241f;}
+  .home::before{content:"";position:absolute;inset:0;opacity:.6;
+    background:radial-gradient(circle at 80% 15%,rgba(95,191,58,.14),transparent 45%);}
+  .home .eyebrow{color:var(--green-deep);}
+  .home h2{font-family:'Newsreader';font-weight:500;letter-spacing:-.01em;}
+  .home h2 em{font-style:italic;color:var(--green-deep);}
+  .home p{color:#5a5e54;}
+  .home .enter{background:#2f7d2e;color:#fff;border-radius:40px;}
+  .home .tag{color:#8a8e82;}
+  .home .content{position:relative;z-index:2;}
+
+  .footer{text-align:center;padding:30px 24px 50px;background:#0b0d0b;}
+  .footer p{color:#6b736a;font-size:13px;line-height:1.6;max-width:600px;margin:0 auto;}
+  .footer .tw{font-family:'Barlow Condensed';font-weight:700;text-transform:uppercase;letter-spacing:.1em;
+    color:#9aa297;font-size:15px;margin-top:14px;}
+
+  /* crisis modal */
+  .overlay{position:fixed;inset:0;z-index:90;background:rgba(5,6,5,.8);backdrop-filter:blur(4px);
+    display:none;align-items:center;justify-content:center;padding:20px;}
+  .overlay.on{display:flex;}
+  .modal{width:min(440px,94vw);background:#161916;border:1px solid #2a2f2a;border-top:4px solid var(--coral);}
+  .modal h3{font-family:'Barlow Condensed';font-weight:700;text-transform:uppercase;font-size:25px;margin:0;padding:20px 22px 4px;color:#fff;}
+  .modal .sub{padding:0 22px 14px;color:#9aa297;font-size:13.5px;line-height:1.5;}
+  .crow{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:13px 22px;border-top:1px solid #2a2f2a;}
+  .crow .cn{font-weight:600;font-size:14.5px;color:#eef2ec;}
+  .crow .cnote{font-size:12px;color:#8c948c;margin-top:2px;}
+  .crow a{background:var(--green);color:#101310;font-family:'Barlow Condensed';font-weight:700;font-size:15px;padding:8px 15px;letter-spacing:.04em;white-space:nowrap;}
+  .crow a.txt{background:#1f231f;color:var(--green);border:1px solid #2a2f2a;}
+  .closex{float:right;background:none;border:none;color:#8c948c;font-size:23px;padding:15px 18px;line-height:1;}
+
+  @media(max-width:760px){
+    .split{grid-template-columns:1fr;}
+    .panel{min-height:440px;padding:40px 32px;}
+    .tag{top:32px;left:32px;}
+    .intro{padding-top:96px;}
+  }
+</style>
+</head>
+<body>
+  <div class="top">
+    <div class="brand"><div class="mark"></div><b>BUILT COMPASS</b></div>
+    <button class="helpbtn" onclick="document.getElementById('ov').classList.add('on')">
+      <span class="pulse"></span> Get Help Now
+    </button>
+  </div>
+
+  <section class="intro">
+    <div class="kicker">A Project BUILT tool · Free for every worker &amp; family</div>
+    <h1>Pulling up stakes for the job?<br/><span class="g">Land like you've been here.</span></h1>
+    <p>Construction takes you where the work is — new towns, new counties, new everything. BUILT Compass hands your whole family a real briefing on any place in America: the hazards, the hospitals, the housing, the help, and how to feel at home faster.</p>
+    <div class="note">Two directions to compare · choose one to explore</div>
+  </section>
+
+  <section class="split">
+    <a class="panel field" href="field.html">
+      <div class="stripes"></div>
+      <div class="tag">DIRECTION 01 / DARK · MAP-CENTRIC</div>
+      <div class="content">
+        <div class="eyebrow">FIELD</div>
+        <h2>Scout the ground.</h2>
+        <p>A rugged, map-first command view. Drop into any location on a live map and watch the briefing dock in beside it — built for the worker sizing up the next job.</p>
+        <span class="enter">Enter FIELD →</span>
+      </div>
+    </a>
+
+    <a class="panel home" href="homebase.html">
+      <div class="tag">DIRECTION 02 / WARM · DASHBOARD</div>
+      <div class="content">
+        <div class="eyebrow">HOMEBASE</div>
+        <h2>Settle in, <em>softer.</em></h2>
+        <p>A warm, human dashboard. Search a place and a calm grid of cards gathers everything your family needs to feel at home — made for the move, not just the job.</p>
+        <span class="enter">Enter HOMEBASE →</span>
+      </div>
+    </a>
+  </section>
+
+  <footer class="footer">
+    <p>BUILT Compass is built by Project BUILT — a nonprofit confronting addiction, suicide, burnout, and disconnection in construction by strengthening workers, families, and job sites.</p>
+    <div class="tw">Together we build · Together we thrive</div>
+  </footer>
+
+  <div class="overlay" id="ov" onclick="if(event.target===this)this.classList.remove('on')">
+    <div class="modal">
+      <button class="closex" onclick="document.getElementById('ov').classList.remove('on')">×</button>
+      <h3>You're not alone on this</h3>
+      <p class="sub">If you or someone with you is struggling, reach out right now. Free, confidential, and built for people in the trades.</p>
+      <div class="crow"><div><div class="cn">988 Suicide &amp; Crisis Lifeline</div><div class="cnote">Call or text, 24/7</div></div><a href="tel:988">988</a></div>
+      <div class="crow"><div><div class="cn">SAMHSA National Helpline</div><div class="cnote">Free treatment referral, 24/7</div></div><a href="tel:18006624357">1-800-662-4357</a></div>
+      <div class="crow"><div><div class="cn">Crisis Text Line</div><div class="cnote">Text-based support, 24/7</div></div><a class="txt" href="sms:741741?&body=HOME">Text HOME to 741741</a></div>
+      <div class="crow"><div><div class="cn">Emergency</div><div class="cnote">Immediate danger</div></div><a href="tel:911">911</a></div>
+    </div>
+  </div>
+</body>
+</html>

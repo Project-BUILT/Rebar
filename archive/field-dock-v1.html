@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>BUILT Compass — FIELD</title>
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+  integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+  integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+
+<script src="assets/built-core.js"></script>
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="" />
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Barlow:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+
+<style>
+  :root{
+    --green:#6dd441; --green-dim:#4ea52d;
+    --ink:#0b0d0b; --panel:#15181500; --panel-solid:#16191600;
+    --card:#191c19; --card-2:#1f231f;
+    --line:#2a2f2a; --muted:#8c948c; --muted-2:#5d645d;
+    --text:#eef2ec; --amber:#ffb43d; --danger:#ff5a4d;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;height:100%;background:var(--ink);color:var(--text);
+    font-family:'Barlow',system-ui,sans-serif;-webkit-font-smoothing:antialiased;overflow:hidden;}
+  #root{height:100%;}
+  .mono{font-family:'JetBrains Mono',monospace;}
+  .cond{font-family:'Barlow Condensed',sans-serif;}
+  button{font-family:inherit;cursor:pointer;}
+  ::-webkit-scrollbar{width:9px;height:9px;}
+  ::-webkit-scrollbar-thumb{background:#2c322c;border-radius:0;}
+  ::-webkit-scrollbar-track{background:transparent;}
+
+  .stage{position:relative;height:100%;width:100%;}
+  #map{position:absolute;inset:0;z-index:1;background:#0b0d0b;}
+  .leaflet-container{background:#0b0d0b;font-family:'JetBrains Mono',monospace;}
+  .leaflet-control-attribution{background:rgba(11,13,11,.7)!important;color:#5d645d!important;font-size:9px;}
+  .leaflet-control-attribution a{color:#8c948c!important;}
+  .leaflet-bar a{background:#161916;color:#cfe9bd;border-color:#2a2f2a;}
+
+  /* top hazard bar */
+  .topbar{position:absolute;top:0;left:0;right:0;z-index:30;display:flex;align-items:center;
+    justify-content:space-between;padding:14px 18px;pointer-events:none;}
+  .brand{display:flex;align-items:center;gap:11px;pointer-events:auto;}
+  .mark{width:30px;height:30px;background:var(--green);position:relative;flex:none;
+    clip-path:polygon(0 0,100% 0,100% 70%,70% 100%,0 100%);}
+  .mark::after{content:"";position:absolute;inset:8px;background:var(--ink);
+    clip-path:polygon(0 0,100% 0,100% 60%,60% 100%,0 100%);}
+  .brand b{font-family:'Barlow Condensed';font-weight:700;font-size:20px;letter-spacing:.06em;line-height:1;}
+  .brand span{font-size:10px;letter-spacing:.34em;color:var(--muted);display:block;margin-top:2px;}
+
+  .helpbtn{pointer-events:auto;display:flex;align-items:center;gap:8px;background:var(--danger);
+    color:#fff;border:none;padding:9px 14px 8px;font-family:'Barlow Condensed';font-weight:700;
+    font-size:15px;letter-spacing:.07em;text-transform:uppercase;
+    box-shadow:0 6px 22px rgba(255,90,77,.35);}
+  .helpbtn:hover{filter:brightness(1.08);}
+  .helpbtn .pulse{width:8px;height:8px;border-radius:50%;background:#fff;
+    box-shadow:0 0 0 0 rgba(255,255,255,.7);animation:pulse 1.8s infinite;}
+  @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(255,255,255,.6);}70%{box-shadow:0 0 0 7px rgba(255,255,255,0);}100%{box-shadow:0 0 0 0 rgba(255,255,255,0);}}
+
+  /* hero search (idle) */
+  .hero{position:absolute;z-index:20;inset:0;display:flex;flex-direction:column;
+    align-items:center;justify-content:center;text-align:center;
+    background:radial-gradient(ellipse at center,rgba(11,13,11,.35),rgba(11,13,11,.82));
+    transition:opacity .5s ease;padding:20px;}
+  .hero.gone{opacity:0;pointer-events:none;}
+  .kicker{font-family:'JetBrains Mono';font-size:12px;letter-spacing:.32em;color:var(--green);
+    text-transform:uppercase;margin-bottom:18px;}
+  .hero h1{font-family:'Barlow Condensed';font-weight:700;text-transform:uppercase;
+    font-size:clamp(40px,7vw,86px);line-height:.92;letter-spacing:.01em;margin:0 0 8px;}
+  .hero h1 .g{color:var(--green);}
+  .hero p{color:var(--muted);max-width:540px;font-size:16px;line-height:1.5;margin:6px 0 30px;}
+
+  .searchwrap{display:flex;width:min(620px,92vw);background:var(--card);border:1px solid var(--line);
+    box-shadow:0 24px 60px rgba(0,0,0,.6);}
+  .searchwrap.lg{height:64px;}
+  .searchwrap input{flex:1;background:transparent;border:none;outline:none;color:var(--text);
+    font-size:18px;padding:0 20px;font-family:'Barlow';}
+  .searchwrap input::placeholder{color:var(--muted-2);}
+  .searchwrap button.go{background:var(--green);color:var(--ink);border:none;padding:0 26px;
+    font-family:'Barlow Condensed';font-weight:700;font-size:18px;letter-spacing:.06em;text-transform:uppercase;}
+  .searchwrap button.go:hover{background:#7ee84d;}
+  .searchwrap button.go:disabled{opacity:.55;cursor:wait;}
+
+  .chips{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-top:18px;}
+  .chip{background:rgba(25,28,25,.7);border:1px solid var(--line);color:var(--muted);
+    padding:7px 13px;font-size:12.5px;font-family:'JetBrains Mono';letter-spacing:.02em;}
+  .chip:hover{border-color:var(--green);color:var(--green);}
+
+  /* results dock */
+  .dock{position:absolute;top:0;right:0;bottom:0;z-index:25;width:min(480px,46vw);
+    background:rgba(13,15,13,.93);backdrop-filter:blur(8px);border-left:1px solid var(--line);
+    display:flex;flex-direction:column;transform:translateX(102%);transition:transform .5s cubic-bezier(.4,0,.1,1);}
+  .dock.open{transform:translateX(0);}
+  .dockhead{padding:64px 22px 16px;border-bottom:1px solid var(--line);position:relative;flex:none;
+    background:linear-gradient(180deg,rgba(109,212,65,.06),transparent);}
+  .stripes{position:absolute;top:0;left:0;right:0;height:5px;
+    background:repeating-linear-gradient(135deg,var(--green) 0 12px,var(--ink) 12px 24px);opacity:.9;}
+  .placelabel{font-family:'Barlow Condensed';font-weight:700;text-transform:uppercase;
+    font-size:30px;line-height:1;letter-spacing:.01em;}
+  .placesub{font-family:'JetBrains Mono';font-size:11.5px;letter-spacing:.12em;color:var(--green);
+    margin-top:7px;text-transform:uppercase;}
+  .minisearch{display:flex;margin-top:15px;border:1px solid var(--line);background:var(--card);height:40px;}
+  .minisearch input{flex:1;background:transparent;border:none;outline:none;color:var(--text);
+    padding:0 13px;font-size:14px;font-family:'Barlow';}
+  .minisearch button{background:transparent;border:none;border-left:1px solid var(--line);color:var(--green);
+    padding:0 14px;font-family:'JetBrains Mono';font-size:13px;}
+  .minisearch button:hover{background:var(--card-2);}
+
+  .dockscroll{flex:1;overflow-y:auto;padding:14px 16px 40px;}
+
+  .cat{border:1px solid var(--line);background:var(--card);margin-bottom:11px;}
+  .cat-head{display:flex;align-items:center;gap:11px;padding:12px 14px;border-bottom:1px solid transparent;}
+  .cat.has .cat-head{border-bottom-color:var(--line);}
+  .glyph{width:30px;height:30px;flex:none;display:grid;place-items:center;background:var(--card-2);
+    border:1px solid var(--line);color:var(--green);font-family:'JetBrains Mono';font-weight:500;font-size:14px;}
+  .cat.alert .glyph{color:var(--amber);border-color:rgba(255,180,61,.4);}
+  .cat-label{font-family:'Barlow Condensed';font-weight:700;text-transform:uppercase;font-size:17px;
+    letter-spacing:.04em;flex:1;}
+  .cat-headline{font-size:13px;color:var(--muted);padding:0 14px 12px;line-height:1.45;}
+  .cat.alert .cat-headline{color:var(--amber);}
+  .cat-body{padding:2px 14px 10px;}
+  .item{padding:11px 0;border-top:1px solid var(--line);}
+  .item:first-child{border-top:none;}
+  .item .it-title{font-weight:600;font-size:15px;line-height:1.3;}
+  .item .it-detail{font-size:13.5px;color:var(--muted);line-height:1.5;margin-top:3px;}
+  .item .it-foot{display:flex;flex-wrap:wrap;gap:7px;align-items:center;margin-top:10px;}
+  .it-meta{font-family:'JetBrains Mono';font-size:10.5px;color:var(--green);letter-spacing:.05em;
+    text-transform:uppercase;background:rgba(109,212,65,.1);padding:5px 8px;border:1px solid rgba(109,212,65,.2);}
+  .cat.alert .it-meta{color:var(--amber);border-color:rgba(255,180,61,.28);background:rgba(255,180,61,.08);}
+  .it-act{display:inline-flex;align-items:center;gap:5px;font-family:'Barlow';font-size:12.5px;font-weight:600;
+    text-decoration:none;padding:8px 12px;min-height:38px;border:1px solid var(--line);color:var(--text);background:var(--card-2);}
+  .it-act:hover{border-color:var(--green);color:var(--green);}
+  .it-act.call{background:var(--green);color:var(--ink);border-color:var(--green);}
+  .it-act.call:hover{filter:brightness(1.08);color:var(--ink);}
+  .cat-actions{display:flex;flex-wrap:wrap;gap:8px;padding:4px 14px 14px;}
+  .cat-actions a{display:inline-flex;align-items:center;gap:7px;font-family:'Barlow Condensed';font-weight:700;
+    text-transform:uppercase;letter-spacing:.04em;font-size:14.5px;text-decoration:none;padding:11px 15px;min-height:46px;
+    background:rgba(109,212,65,.1);color:var(--green);border:1px solid rgba(109,212,65,.28);}
+  .cat-actions a::before{content:"→";opacity:.7;}
+  .cat-actions a:hover{background:var(--green);color:var(--ink);}
+  .cat.alert .cat-actions a{color:var(--amber);background:rgba(255,180,61,.08);border-color:rgba(255,180,61,.28);}
+  .cat.alert .cat-actions a:hover{background:var(--amber);color:var(--ink);}
+  @keyframes rise{from{transform:translateY(12px);}to{transform:translateY(0);}}
+  @media (prefers-reduced-motion: no-preference){ .item{animation:rise .45s ease both;} }
+  .dockprog{display:flex;align-items:center;gap:10px;margin-top:13px;font-family:'JetBrains Mono';
+    font-size:10.5px;letter-spacing:.12em;color:var(--muted);text-transform:uppercase;}
+  .pbar{flex:1;height:5px;background:#22271f;overflow:hidden;}
+  .pbar i{display:block;height:100%;background:var(--green);box-shadow:0 0 8px var(--green);
+    transition:width .6s cubic-bezier(.4,0,.1,1);}
+  .callout{margin:10px 14px 13px;padding:9px 11px;background:rgba(109,212,65,.08);
+    border-left:3px solid var(--green);font-size:12.5px;line-height:1.45;color:#cfe9bd;}
+  .cat.alert .callout{background:rgba(255,180,61,.09);border-left-color:var(--amber);color:#f4d79b;}
+
+  .skel{height:11px;background:linear-gradient(90deg,#1d211d 0%,#2a2f2a 50%,#1d211d 100%);
+    background-size:200% 100%;animation:sh 1.3s infinite;margin:7px 14px;}
+  @keyframes sh{0%{background-position:200% 0;}100%{background-position:-200% 0;}}
+  .err{font-size:12px;color:var(--muted-2);padding:0 14px 12px;font-family:'JetBrains Mono';}
+
+  .disclaimer{font-family:'JetBrains Mono';font-size:10px;color:var(--muted-2);line-height:1.6;
+    padding:6px 4px 0;letter-spacing:.02em;}
+
+  /* crisis modal */
+  .overlay{position:fixed;inset:0;z-index:60;background:rgba(5,6,5,.78);backdrop-filter:blur(3px);
+    display:flex;align-items:center;justify-content:center;padding:20px;}
+  .modal{width:min(440px,94vw);background:var(--card);border:1px solid var(--line);
+    border-top:4px solid var(--danger);box-shadow:0 30px 80px rgba(0,0,0,.7);}
+  .modal h3{font-family:'Barlow Condensed';font-weight:700;text-transform:uppercase;font-size:24px;
+    margin:0;padding:20px 22px 4px;letter-spacing:.02em;}
+  .modal .sub{padding:0 22px 14px;color:var(--muted);font-size:13.5px;line-height:1.5;}
+  .crisisrow{display:flex;justify-content:space-between;align-items:center;gap:12px;
+    padding:13px 22px;border-top:1px solid var(--line);}
+  .crisisrow .cn{font-weight:600;font-size:14.5px;}
+  .crisisrow .cnote{font-size:12px;color:var(--muted);margin-top:2px;}
+  .crisisrow a{background:var(--green);color:var(--ink);text-decoration:none;font-family:'Barlow Condensed';
+    font-weight:700;font-size:15px;padding:8px 15px;letter-spacing:.05em;white-space:nowrap;}
+  .crisisrow a.txt{background:var(--card-2);color:var(--green);border:1px solid var(--line);}
+  .closex{float:right;background:none;border:none;color:var(--muted);font-size:22px;
+    padding:16px 18px;line-height:1;}
+  .closex:hover{color:var(--text);}
+
+  .spinner{display:inline-block;width:13px;height:13px;border:2px solid var(--line);
+    border-top-color:var(--green);border-radius:50%;animation:spin .8s linear infinite;}
+  @keyframes spin{to{transform:rotate(360deg);}}
+
+  .marker-dot{width:16px;height:16px;background:var(--green);border:3px solid var(--ink);
+    border-radius:50%;box-shadow:0 0 0 2px var(--green),0 0 20px var(--green);position:relative;}
+  .marker-dot::before,.marker-dot::after{content:"";position:absolute;left:50%;top:50%;width:16px;height:16px;
+    border-radius:50%;border:2px solid var(--green);transform:translate(-50%,-50%);animation:radar 2.6s ease-out infinite;}
+  .marker-dot::after{animation-delay:1.3s;}
+  @keyframes radar{0%{width:16px;height:16px;opacity:.7;}100%{width:92px;height:92px;opacity:0;}}
+
+  @media(max-width:760px){
+    .dock{width:100%;left:0;}
+    .hero h1{font-size:clamp(34px,11vw,60px);}
+  }
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<script type="text/babel">
+const { useState, useEffect, useRef, useCallback } = React;
+
+function CrisisModal({ onClose }) {
+  return (
+    <div className="overlay" onClick={onClose}>
+      <div className="modal" onClick={e => e.stopPropagation()}>
+        <button className="closex" onClick={onClose}>×</button>
+        <h3>You're not alone on this</h3>
+        <p className="sub">If you or someone with you is struggling, reach out right now. Free, confidential, and built for people in the trades.</p>
+        {BUILT.CRISIS.lines.map((l, i) => (
+          <div className="crisisrow" key={i}>
+            <div>
+              <div className="cn">{l.name}</div>
+              <div className="cnote">{l.note}</div>
+            </div>
+            {l.tel
+              ? <a href={"tel:" + l.tel}>{l.num}</a>
+              : <a className="txt" href="sms:741741?&body=HOME">{l.num}</a>}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function CatCard({ cat, data, place }) {
+  const loading = data === "loading";
+  const alert = cat.id === "hazards";
+  const has = data && data !== "loading" && !data.error;
+  const actions = has && place ? BUILT.categoryActions(cat.id, place) : [];
+  return (
+    <div className={"cat" + (has ? " has" : "") + (alert ? " alert" : "")}>
+      <div className="cat-head">
+        <div className="glyph mono">{cat.glyph}</div>
+        <div className="cat-label">{cat.label}</div>
+        {loading && <span className="spinner" />}
+      </div>
+      {loading && <><div className="skel" style={{width:"82%"}} /><div className="skel" style={{width:"60%"}} /></>}
+      {has && data.headline && <div className="cat-headline">{data.headline}</div>}
+      {has && data.items && data.items.length > 0 && (
+        <div className="cat-body">
+          {data.items.map((it, i) => {
+            const links = BUILT.itemLinks(it, place);
+            return (
+              <div className="item" key={i} style={{animationDelay:(i*70)+"ms"}}>
+                <div className="it-title">{it.title}</div>
+                {it.detail && <div className="it-detail">{it.detail}</div>}
+                {(it.meta || links.length > 0) && (
+                  <div className="it-foot">
+                    {it.meta && <span className="it-meta">{it.meta}</span>}
+                    {links.map((l, j) => l.tel
+                      ? <a className="it-act call" key={j} href={"tel:" + l.tel}>{l.label}</a>
+                      : <a className="it-act" key={j} href={l.url} target="_blank" rel="noopener">{l.label}</a>)}
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      )}
+      {has && data.callout && <div className="callout">{data.callout}</div>}
+      {has && actions.length > 0 && (
+        <div className="cat-actions">
+          {actions.map((a, i) => a.tel
+            ? <a key={i} href={"tel:" + a.tel}>{a.label}</a>
+            : <a key={i} href={a.url} target="_blank" rel="noopener">{a.label}</a>)}
+        </div>
+      )}
+      {data && data.error && <div className="err">// couldn't load — try again</div>}
+    </div>
+  );
+}
+
+function App() {
+  const [query, setQuery] = useState("");
+  const [mini, setMini] = useState("");
+  const [place, setPlace] = useState(null);
+  const [status, setStatus] = useState("idle"); // idle | locating | results | notfound
+  const [results, setResults] = useState({});
+  const [crisis, setCrisis] = useState(false);
+  const mapRef = useRef(null);
+  const markerRef = useRef(null);
+  const reqRef = useRef(0);
+
+  useEffect(() => {
+    const map = L.map("map", { zoomControl: false, attributionControl: true })
+      .setView([39.5, -98.35], 4);
+    L.control.zoom({ position: "bottomright" }).addTo(map);
+    L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png", {
+      attribution: '&copy; OpenStreetMap &copy; CARTO', maxZoom: 19, subdomains: "abcd"
+    }).addTo(map);
+    mapRef.current = map;
+    setTimeout(() => map.invalidateSize(), 200);
+    return () => map.remove();
+  }, []);
+
+  const run = useCallback(async (q) => {
+    if (!q || !q.trim()) return;
+    const id = ++reqRef.current;
+    setStatus("locating");
+    const p = await BUILT.geocode(q.trim());
+    if (id !== reqRef.current) return;
+    if (!p) { setStatus("notfound"); return; }
+    setPlace(p);
+    setStatus("results");
+    // seed all categories as loading
+    const seed = {};
+    BUILT.CATEGORIES.forEach(c => seed[c.id] = "loading");
+    setResults(seed);
+    // map
+    const map = mapRef.current;
+    map.flyTo([p.lat, p.lng], 11, { duration: 1.4 });
+    if (markerRef.current) markerRef.current.remove();
+    markerRef.current = L.marker([p.lat, p.lng], {
+      icon: L.divIcon({ className: "", html: '<div class="marker-dot"></div>', iconSize: [18,18], iconAnchor: [9,9] })
+    }).addTo(map);
+    // stream lookups
+    BUILT.lookupAll(p, {
+      concurrency: 3,
+      onResult: (cat, data) => {
+        if (id !== reqRef.current) return;
+        setResults(prev => ({ ...prev, [cat.id]: data }));
+      }
+    });
+  }, []);
+
+  const onSubmit = (e) => { e.preventDefault(); run(query); };
+  const onMini = (e) => { e.preventDefault(); if (mini.trim()) { setQuery(mini); run(mini); setMini(""); } };
+
+  const idle = status === "idle" || status === "notfound";
+  const loaded = Object.values(results).filter(v => v && v !== "loading").length;
+
+  return (
+    <div className="stage">
+      <div id="map"></div>
+
+      <div className="topbar">
+        <div className="brand">
+          <div className="mark"></div>
+          <div>
+            <b>BUILT COMPASS</b>
+            <span>FIELD</span>
+          </div>
+        </div>
+        <button className="helpbtn" onClick={() => setCrisis(true)}>
+          <span className="pulse"></span> Get Help Now
+        </button>
+      </div>
+
+      <div className={"hero" + (idle ? "" : " gone")}>
+        <div className="kicker">Project BUILT · For workers &amp; families on the move</div>
+        <h1>Know the ground<br/>before you <span className="g">land.</span></h1>
+        <p>Type a ZIP, town, county, or address. We'll hand you the lay of the land — hazards, hospitals, housing, help, and how to plug in.</p>
+        <form className="searchwrap lg" onSubmit={onSubmit}>
+          <input autoFocus value={query} onChange={e => setQuery(e.target.value)}
+            placeholder="Where are you headed?  (e.g. 58801 or Williston, ND)" />
+          <button className="go" type="submit" disabled={status==="locating"}>
+            {status === "locating" ? "Locating…" : "Scout It"}
+          </button>
+        </form>
+        {status === "notfound" && <p style={{color:"var(--danger)",marginTop:14}}>Couldn't find that one. Try a ZIP or "Town, State".</p>}
+        <div className="chips">
+          {BUILT.QUICK.map(c => (
+            <button className="chip" key={c.label} onClick={() => { setQuery(c.label); run(c.q); }}>{c.label}</button>
+          ))}
+        </div>
+      </div>
+
+      <div className={"dock" + (status === "results" ? " open" : "")}>
+        <div className="dockhead">
+          <div className="stripes"></div>
+          <div className="placelabel">{place ? place.label : ""}</div>
+          <div className="placesub">{place ? [place.county, place.zip].filter(Boolean).join(" · ") || place.state : ""}</div>
+          <div className="dockprog">
+            <div className="pbar"><i style={{width:(loaded/BUILT.CATEGORIES.length*100)+"%"}}></i></div>
+            <span>{loaded < BUILT.CATEGORIES.length ? ("Scanning " + loaded + "/" + BUILT.CATEGORIES.length) : (BUILT.CATEGORIES.length + " sectors mapped")}</span>
+          </div>
+          <form className="minisearch" onSubmit={onMini}>
+            <input value={mini} onChange={e => setMini(e.target.value)} placeholder="Scout another place…" />
+            <button type="submit" className="mono">→</button>
+          </form>
+        </div>
+        <div className="dockscroll">
+          {BUILT.CATEGORIES.map(cat => (
+            <CatCard key={cat.id} cat={cat} data={results[cat.id]} place={place} />
+          ))}
+          <div className="disclaimer">
+            AI-built local briefing. Use it as a starting point and double-check the details that matter.
+            In an emergency, call 911. Powered by Project BUILT.
+          </div>
+        </div>
+      </div>
+
+      {crisis && <CrisisModal onClose={() => setCrisis(false)} />}
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+</script>
+</body>
+</html>
