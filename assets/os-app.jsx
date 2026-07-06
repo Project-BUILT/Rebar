@@ -63,7 +63,7 @@ const CRISIS = [
   { id:"ctext", name:"Crisis Text Line", num:"Text HOME to 741741", tel:"" },
   { id:"c911", name:"Emergency", num:"911", tel:"911" }
 ];
-const FUND = { donate:"https://givebutter.com/ProjectBUILT", volunteer:"https://getbuilt.org/volunteer/", site:"https://getbuilt.org/" };
+const FUND = { donate:"https://givebutter.com/ProjectBUILT", volunteer:"https://getbuilt.org/volunteer/", site:"https://getbuilt.org/", apply:"https://getbuilt.org/apply/" };
 
 // ---- the punchlist: six scopes, practical first ----
 // Display strings live in i18n (rb.room.* / rb.pl.*); this holds structure.
@@ -90,10 +90,18 @@ function plItems(id, role){
   return out;
 }
 // who the PM is helping, for live prompts (day plans, how-tos)
+function tradeLine(profile){
+  if(!profile) return "";
+  const bits = [];
+  if(profile.trade) bits.push("Trade: "+T("rb.tr."+profile.trade));
+  if(profile.yearsIn) bits.push(T("rb.yr."+profile.yearsIn)+" years in");
+  if(profile.proj) bits.push("current project: "+T("rb.pj."+profile.proj));
+  return bits.length ? " "+bits.join(", ")+"." : "";
+}
 function personLine(profile){
   return profile.builder==="spouse"
-    ? ("PERSON: the partner holding the home front while "+(profile.worker||"a construction worker")+" is away for work. At home with them: "+((profile.home||[]).join(", ")||"the family")+".")
-    : ("PERSON: "+(profile.role||"a construction worker")+", working at "+(profile.site||"the jobsite")+"."+(profile.travels===true?" The work takes them away from home.":profile.travels===false?" They're home most nights.":""));
+    ? ("PERSON: the partner holding the home front while "+(profile.worker||"a construction worker")+" is away for work. At home with them: "+((profile.home||[]).join(", ")||"the family")+"."+tradeLine(profile))
+    : ("PERSON: "+(profile.role||"a construction worker")+", working at "+(profile.site||"the jobsite")+"."+(profile.travels===true?" The work takes them away from home.":profile.travels===false?" They're home most nights.":"")+tradeLine(profile));
 }
 
 function Hex({size,cls}){ return (
@@ -176,6 +184,7 @@ function Auth({ onAuthed }){
           <div className="author"><span>{T("rb.auth.or")}</span></div>
           <button className="sbtn" onClick={()=>setMode("email")} disabled={!!busy}><span className="smk">@</span><span>{T("rb.auth.email")}</span></button>
           <p className="authnote">{T("rb.auth.note")}</p>
+          <button type="button" className="authback" onClick={()=>onAuthed({ provider:"preview", email:"preview@rebar", name:"", pulled:false })}>{T("rb.auth.demo")} →</button>
         </div>
       ) : (
         <form className="authbox" onSubmit={emailSubmit}>

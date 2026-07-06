@@ -213,8 +213,75 @@ function BodyPlan({ profile }){
   );
 }
 
+// ---------- MONEY: the cushion, in weeks ----------
+function fmtMoney(n){ try{ return "$"+Math.round(n).toLocaleString("en-US"); }catch(_){ return "$"+Math.round(n); } }
+function MoneyRunway({ profile, onPatch, onAdd }){
+  const c = (profile&&profile.cushion)||{};
+  const [take,setTake] = uS(c.take||"");
+  const [bills,setBills] = uS(c.bills||"");
+  const [save,setSave] = uS(c.save||"");
+  const [out,setOut] = uS(c.w!=null ? c : null);
+  const punch = (profile&&profile.punch)||{};
+  const onList = !!punch["money:0"];
+  function run(e){
+    e.preventDefault();
+    const b = parseFloat(bills), s = parseFloat(save)||0;
+    if(!(b>0)) return;
+    const w = Math.max(0, Math.floor(s/(b/4.33)));
+    const rec = { take, bills, save, w };
+    setOut(rec); onPatch && onPatch({ cushion: rec });
+  }
+  if(out){
+    const b = parseFloat(out.bills)||0;
+    const w = out.w;
+    return (
+      <div>
+        <div className="fsnaplabel" style={{marginTop:4}}>{t("rb.money.calcT")}</div>
+        <div className="presp" style={{marginTop:0}}>
+          {w<=0 ? t("rb.money.runway0") : w===1 ? t("rb.money.runway1") : t("rb.money.runway",{w})}
+          {b>0 && w<12 && <div style={{marginTop:8,fontSize:13.5,color:"var(--muted)"}}>{t("rb.money.goal",{amt:fmtMoney(b/4.33*4)})}</div>}
+          <div className="pacts">
+            {w<12 && <button className={"pladd"+(onList?" on":"")} style={{marginLeft:0}} disabled={onList} onClick={()=>{ if(!onList) onAdd("money",0); }}>{onList?t("rb.money.onlist"):t("rb.money.addfix")}</button>}
+            <button className="minilink" onClick={()=>setOut(null)}>{t("rb.money.edit")}</button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+  return (
+    <form onSubmit={run}>
+      <div className="fsnaplabel" style={{marginTop:4}}>{t("rb.money.calcT")}</div>
+      <p style={{color:"var(--muted)",fontSize:13.5,lineHeight:1.5,margin:"0 0 10px"}}>{t("rb.money.calcSub")}</p>
+      <div className="fld"><label>{t("rb.money.take")}</label><input type="number" inputMode="decimal" min="0" value={take} onChange={e=>setTake(e.target.value)} placeholder="$" /></div>
+      <div className="fld"><label>{t("rb.money.bills")}</label><input type="number" inputMode="decimal" min="0" value={bills} onChange={e=>setBills(e.target.value)} placeholder="$" /></div>
+      <div className="fld"><label>{t("rb.money.save")}</label><input type="number" inputMode="decimal" min="0" value={save} onChange={e=>setSave(e.target.value)} placeholder="$" /></div>
+      <button className="btn" type="submit" style={{width:"100%"}} disabled={!(parseFloat(bills)>0)}>{t("rb.money.run")}</button>
+    </form>
+  );
+}
+
+// ---------- RECOVERY: real doors, tonight ----------
+const REC_FINDERS = [
+  { t:"FindTreatment.gov", u:"https://findtreatment.gov/" },
+  { t:"AA meetings", u:"https://www.aa.org/find-aa" },
+  { t:"NA meetings", u:"https://www.na.org/meetingsearch/" },
+  { t:"SMART Recovery", u:"https://meetings.smartrecovery.org/meetings/" }
+];
+function RecoveryFinders(){
+  return (
+    <div>
+      <div className="fsnaplabel">{t("rb.rec.findT")}</div>
+      <p style={{color:"var(--muted)",fontSize:13.5,lineHeight:1.5,margin:"0 0 10px"}}>{t("rb.rec.findSub")}</p>
+      <div className="linkrow" style={{marginTop:0}}>
+        {REC_FINDERS.map((l,i)=>(<a className="minilink" key={i} href={l.u} onClick={e=>P.openExt(e,l.u)}>{l.t}</a>))}
+        <a className="minilink" href="https://www.intherooms.com/" onClick={e=>P.openExt(e,"https://www.intherooms.com/")}>{t("rb.rec.online")} · In The Rooms</a>
+      </div>
+    </div>
+  );
+}
+
 // ---------- SCOPE SHEET ----------
-function RoomSheet({ room, profile, onClose, onHelp, onContact, onTogglePunch, onOpenDock }){
+function RoomSheet({ room, profile, onClose, onHelp, onContact, onTogglePunch, onOpenDock, onPatch }){
   const r = room;
   const role = profile && profile.builder;
   const punch = (profile&&profile.punch)||{};
@@ -235,7 +302,7 @@ function RoomSheet({ room, profile, onClose, onHelp, onContact, onTogglePunch, o
       <p className="lede">{lede("people")}</p>
       <Chat profile={profile} />
       <PL id="people" />
-      <Partner label={t("rb.sheet.people.plabel")} name={t("rb.sheet.people.pname")} desc={t("rb.sheet.people.pdesc")} links={[{t:t("rb.retreat.cta"),u:"https://getbuilt.org/"}]} />
+      <Partner label={t("rb.sheet.people.plabel")} name={t("rb.sheet.people.pname")} desc={t("rb.sheet.people.pdesc")} links={[{t:t("rb.retreat.cta"),u:P.FUND.apply}]} />
     </React.Fragment>;
   } else if(r.id==="travel"){
     body = <React.Fragment>
@@ -268,6 +335,7 @@ function RoomSheet({ room, profile, onClose, onHelp, onContact, onTogglePunch, o
   } else if(r.id==="money"){
     body = <React.Fragment>
       <p className="lede">{lede("money")}</p>
+      <MoneyRunway profile={profile} onPatch={onPatch} onAdd={onTogglePunch} />
       <PL id="money" />
       <div className="linkrow"><button className="minilink solid" onClick={onContact}>{t("rb.needthis")}</button><button className="minilink" onClick={onHelp}>{t("rb.helpnow")}</button></div>
       <div className="note">{t("rb.sheet.money.note")}</div>
@@ -276,6 +344,7 @@ function RoomSheet({ room, profile, onClose, onHelp, onContact, onTogglePunch, o
     // recovery
     body = <React.Fragment>
       <p className="lede">{lede("recovery")}</p>
+      <RecoveryFinders />
       <PL id="recovery" />
       <div className="linkrow"><a className="minilink solid" href="tel:18006624357">SAMHSA · 1-800-662-4357</a><button className="minilink" onClick={onContact}>{t("rb.needthis")}</button></div>
       <div className="note">{t("rb.sheet.recovery.note")}</div>
@@ -295,10 +364,25 @@ function RoomSheet({ room, profile, onClose, onHelp, onContact, onTogglePunch, o
 }
 
 // ---------- DISCOVERY (scoping the job) ----------
+const TRADE_OPTS = ["carp","elec","pipe","iron","lab","op","conc","super","oth"];
+const YEARS_OPTS = ["y0","y3","y10","y20"];
+const PROJ_OPTS = ["data","mfg","com","ind","infra","res"];
+function ChipRow({ opts, prefix, value, onPick }){
+  return (
+    <div className="chips">
+      {opts.map(o=>(
+        <button key={o} className={"chip"+(value===o?" on":"")} onClick={()=>onPick(value===o?null:o)}>{t(prefix+o)}</button>
+      ))}
+    </div>
+  );
+}
 function Discovery({ profile, onDone, onHelp }){
   const [role,setRole] = uS(null); // worker | spouse
   const [travels,setTravels] = uS(null);
-  const wp = { ...profile, builder: role, travels };
+  const [trade,setTrade] = uS(null);
+  const [yearsIn,setYearsIn] = uS(null);
+  const [proj,setProj] = uS(null);
+  const wp = { ...profile, builder: role, travels, trade, yearsIn, proj };
   return (
     <div className="discover">
       <div className="app-bg"></div>
@@ -327,7 +411,7 @@ function Discovery({ profile, onDone, onHelp }){
                 <h1>{t("rb.disc.h2")}</h1>
                 <p className="dsub">{t("rb.disc.sub2")}</p>
               </div>
-              <button className="btn" onClick={()=>onDone({ builder: role, travels })}>{t("rb.disc.go")}</button>
+              <button className="btn" onClick={()=>onDone({ builder: role, travels, trade, yearsIn, proj })}>{t("rb.disc.go")}</button>
             </div>
             <div className="fld" style={{margin:"0 0 14px"}}>
               <label>{t(role==="spouse"?"rb.disc.travelQS":"rb.disc.travelQ")}</label>
@@ -336,6 +420,19 @@ function Discovery({ profile, onDone, onHelp }){
                 <button className={"chip"+(travels===false?" on":"")} onClick={()=>setTravels(false)}>{t("rb.disc.travelNo")}</button>
               </div>
             </div>
+            <div className="fld" style={{margin:"0 0 8px"}}>
+              <label>{t(role==="spouse"?"rb.disc.tradeQS":"rb.disc.tradeQ")} · {t("rb.disc.opt")}</label>
+              <ChipRow opts={TRADE_OPTS} prefix="rb.tr." value={trade} onPick={setTrade} />
+            </div>
+            <div className="fld" style={{margin:"0 0 8px"}}>
+              <label>{t("rb.disc.yearsQ")} · {t("rb.disc.opt")}</label>
+              <ChipRow opts={YEARS_OPTS} prefix="rb.yr." value={yearsIn} onPick={setYearsIn} />
+            </div>
+            <div className="fld" style={{margin:"0 0 6px"}}>
+              <label>{t("rb.disc.projQ")} · {t("rb.disc.opt")}</label>
+              <ChipRow opts={PROJ_OPTS} prefix="rb.pj." value={proj} onPick={setProj} />
+            </div>
+            <p className="note" style={{margin:"0 0 14px"}}>{t("rb.disc.workWhy")}</p>
             <Chat profile={wp} />
             <button className="minilink" style={{marginTop:6}} onClick={()=>setRole(null)}>{t("rb.disc.back")}</button>
           </div>
@@ -396,11 +493,34 @@ function PMSheet({ profile, onClose }){
 }
 
 // ---------- HOME (the punchlist board) ----------
+function hmDaysAgo(d){ try{ return Math.max(0, Math.floor((Date.now()-new Date(d+"T12:00").getTime())/86400000)); }catch(_){ return 0; } }
+function hmAgo(n){ return n<=0?t("rb.dock.agoToday"):(n===1?t("rb.dock.agoDay"):t("rb.dock.agoDays",{n})); }
+function hmItemTitle(it, role){ const src = (it.i!=null) ? P.plItems(it.room, role)[it.i] : null; return (src&&src.t)||it.t; }
+// the PM strip reads the actual state of the job: stalled item > item in motion > amber gauge > check due > default
+function smartPmSub(profile){
+  const role = profile.builder;
+  const items = Object.values(profile.punch||{});
+  const stalled = items.filter(i=>i.status==="todo" && hmDaysAgo(i.added)>=3).sort((a,b)=>hmDaysAgo(b.added)-hmDaysAgo(a.added))[0];
+  if(stalled) return t("rb.pm.smart.stalled",{t:hmItemTitle(stalled,role), ago:hmAgo(hmDaysAgo(stalled.added))});
+  const doing = items.find(i=>i.status==="doing");
+  if(doing) return t("rb.pm.smart.doing",{t:hmItemTitle(doing,role)});
+  const last = RebarLevel.lvLast(profile);
+  if(last && last.flags && last.flags.length) return t("rb.pm.smart.amber",{g:RebarLevel.lvGaugeName(last.flags[0])});
+  if(RebarLevel.lvDue(profile)) return t("rb.pm.smart.due");
+  return t("rb.strip.pm.sub");
+}
 function Home({ profile, onRoom, onHelp, onContact, onList, onPM, onLevel }){
   const hour = new Date().getHours();
   const part = t(hour<12?"rb.greet.morning":hour<17?"rb.greet.afternoon":"rb.greet.evening");
   const name = firstName(profile.name) || "";
   const role = profile.builder;
+  const items = Object.values(profile.punch||{});
+  const doneN = items.filter(i=>i.status==="done").length;
+  const last = RebarLevel.lvLast(profile);
+  const due = RebarLevel.lvDue(profile);
+  const statBits = [];
+  if(items.length) statBits.push(t("rb.stat.list",{n:items.length,d:doneN}));
+  statBits.push(due ? t("rb.stat.due") : t("rb.stat.days",{k:Math.max(0,90-hmDaysAgo(last.date))}));
   return (
     <div className="home">
       <div className="app-bg"></div>
@@ -410,11 +530,12 @@ function Home({ profile, onRoom, onHelp, onContact, onList, onPM, onLevel }){
           <p>{profile.builder==="spouse"
             ? t("rb.home.spouse",{worker:(profile.worker||"")})
             : t("rb.home.worker")}</p>
+          <div className="sitestat">{statBits.join(" · ")}</div>
         </div>
 
         <button className="strip" onClick={onPM} style={{width:"100%",cursor:"pointer",textAlign:"left",marginTop:16,marginBottom:20}}>
           <div className="si" style={{background:"var(--green)",color:"var(--green-ink)",border:"none",fontSize:17}}>PM</div>
-          <div className="st"><b>{t("rb.strip.pm.b")}</b><span>{t("rb.strip.pm.sub")}</span></div>
+          <div className="st"><b>{t("rb.strip.pm.b")}</b><span>{smartPmSub(profile)}</span></div>
           <span className="ar cond" style={{color:"var(--green)",fontSize:22}}>→</span>
         </button>
 
@@ -440,22 +561,10 @@ function Home({ profile, onRoom, onHelp, onContact, onList, onPM, onLevel }){
 
         <RebarLevel.LevelStrip profile={profile} onOpen={onLevel} />
 
-        <button className="strip" onClick={onList} style={{width:"100%",cursor:"pointer",textAlign:"left"}}>
-          <div className="si"><Ico name="list" size={22} /></div>
-          <div className="st"><b>{t("rb.strip.list.b")}</b><span>{t("rb.strip.list.sub")}</span></div>
-          <span className="ar cond" style={{color:"var(--green)",fontSize:22}}>→</span>
-        </button>
-
-        <div className="strip">
-          <div className="si"><Ico name="phone" size={22} /></div>
-          <div className="st"><b>{t("rb.strip.person.b")}</b><span>{t("rb.strip.person.sub")}</span></div>
-          <button className="minilink solid" onClick={onContact}>{t("rb.strip.person.cta")}</button>
-        </div>
-
         <div className="pulsecard" style={{marginTop:24}}>
           <div className="pq">{t("rb.retreat.b")}</div>
           <p className="psub" style={{maxWidth:"72ch",fontSize:14.5,lineHeight:1.55,marginBottom:18}}>{t("rb.retreat.sub")}</p>
-          <a className="btn" href={P.FUND.site} onClick={e=>P.openExt(e,P.FUND.site)}>{t("rb.retreat.cta")} →</a>
+          <a className="btn" href={P.FUND.apply} onClick={e=>P.openExt(e,P.FUND.apply)}>{t("rb.retreat.cta")} →</a>
         </div>
       </div>
 
@@ -470,6 +579,7 @@ function Home({ profile, onRoom, onHelp, onContact, onList, onPM, onLevel }){
           <div className="acts">
             <a className="primary" href={P.FUND.donate} onClick={e=>P.openExt(e,P.FUND.donate)}><span><b>{t("rb.fund.donate")}</b><span>givebutter.com/ProjectBUILT</span></span><span className="ar">→</span></a>
             <a href={P.FUND.volunteer} onClick={e=>P.openExt(e,P.FUND.volunteer)}><span><b>{t("rb.fund.vol")}</b><span>getbuilt.org/volunteer</span></span><span className="ar">→</span></a>
+            <a href={P.FUND.site} onClick={e=>P.openExt(e,P.FUND.site)}><span><b>{t("rb.fund.person")}</b><span>{t("rb.fund.personSub")}</span></span><span className="ar">→</span></a>
           </div>
         </div>
       </div>
@@ -573,6 +683,7 @@ function App(){
   }
 
   function authed(a){ const np={...a}; setProfile(np); P.save(np); setStage("mood"); }
+  function patchProfile(patch){ const np={...profile, ...patch}; setProfile(np); P.save(np); }
   function saveLevel(rec){ const levels=[...((profile&&profile.levels)||[]), rec]; const np={...profile, levels}; setProfile(np); P.save(np); }
   function doneMood(k){ const np={...profile, mood:k, pulseDate:todayStr()}; setProfile(np); P.save(np); setStage(np.builder ? "home" : "discovery"); }
   function doneDiscovery(patch){ const np={...profile, ...patch}; setProfile(np); P.save(np); setStage("home"); }
@@ -591,7 +702,7 @@ function App(){
       {stage==="mood" && profile && <Mood profile={profile} onDone={doneMood} onHelp={()=>setCrisis(true)} />}
       {stage==="discovery" && profile && <Discovery profile={profile} onDone={doneDiscovery} onHelp={()=>setCrisis(true)} />}
       {stage==="home" && profile && <Home profile={profile} onRoom={setRoom} onHelp={()=>setCrisis(true)} onContact={contact} onList={()=>setShowList(true)} onPM={()=>setPm(true)} onLevel={()=>setLevel(true)} />}
-      {roomObj && <RoomSheet room={roomObj} profile={profile} onClose={()=>setRoom(null)} onHelp={()=>{setRoom(null);setCrisis(true);}} onContact={()=>{setRoom(null);contact();}} onTogglePunch={togglePunch} onOpenDock={()=>{setRoom(null);setDock(true);}} />}
+      {roomObj && <RoomSheet room={roomObj} profile={profile} onClose={()=>setRoom(null)} onHelp={()=>{setRoom(null);setCrisis(true);}} onContact={()=>{setRoom(null);contact();}} onTogglePunch={togglePunch} onOpenDock={()=>{setRoom(null);setDock(true);}} onPatch={patchProfile} />}
       {showList && <BuiltList onClose={()=>setShowList(false)} onRoom={id=>{setShowList(false);setRoom(id);}} role={profile&&profile.builder} />}
       {pm && profile && <PMSheet profile={profile} onClose={()=>setPm(false)} />}
       {level && profile && <RebarLevel.LevelCheck profile={profile} onClose={()=>setLevel(false)} onSave={saveLevel} onAdd={togglePunch} onHelp={()=>setCrisis(true)} />}
