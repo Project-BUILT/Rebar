@@ -10,40 +10,59 @@
   // ---- Crisis / national resources (stable, always-available) ----
   const CRISIS = {
     lines: [
-      { name: "988 Suicide & Crisis Lifeline", num: "988", note: "Call or text, 24/7", tel: "988" },
-      { name: "SAMHSA National Helpline", num: "1-800-662-4357", note: "Free, confidential treatment referral, 24/7", tel: "18006624357" },
-      { name: "Crisis Text Line", num: "Text HOME to 741741", note: "Text-based support, 24/7", tel: "" },
-      { name: "Emergency", num: "911", note: "Immediate danger", tel: "911" }
+      { id: "c988", name: "988 Suicide & Crisis Lifeline", num: "988", note: "Call or text, 24/7", tel: "988" },
+      { id: "csam", name: "SAMHSA National Helpline", num: "1-800-662-4357", note: "Free, confidential treatment referral, 24/7", tel: "18006624357" },
+      { id: "ctext", name: "Crisis Text Line", num: "Text HOME to 741741", note: "Text-based support, 24/7", tel: "" },
+      { id: "c911", name: "Emergency", num: "911", note: "Immediate danger", tel: "911" }
     ]
   };
 
   // ---- Category catalog ----
   // guide = what the model should focus on for THIS place.
+  // Order = how cards stack on the briefing. Lead with landing & living, then
+  // family & belonging, then day-to-day, then support & awareness. Hazards is
+  // real but not the first thing a newcomer needs staring at them.
   const CATEGORIES = [
-    { id: "hazards", label: "Local Hazards", glyph: "!", priority: 1,
-      guide: "Region-specific natural & seasonal hazards a newcomer should know: ticks/Lyme, venomous snakes, extreme heat/cold, wildfire smoke, flooding, tornado/hurricane risk, air quality, valley fever, etc. Each item: what it is, WHEN it's worst (season/months), and one concrete way to avoid or prepare. Be specific to this region's actual risk profile." },
+    // — Land & live —
     { id: "health", label: "Health & Hospitals", glyph: "+", priority: 1,
+      teaser: "Nearest ER, urgent care, and how far real help is.",
       guide: "Nearest hospitals, ERs, and urgent care for this area, plus how far the nearest major trauma/ER is. Name real, well-known facilities only if confident; otherwise describe the closest options and distance honestly." },
-    { id: "mental", label: "Mental Health", glyph: "~", priority: 1,
-      guide: "Mental health support relevant to construction workers and families here: county behavioral-health access, sliding-scale/community clinics, and the national crisis lines (always include 988). Plainspoken, no stigma." },
-    { id: "recovery", label: "Recovery & Meetings", glyph: "@", priority: 1,
-      guide: "Addiction recovery support near here: AA/NA meeting availability, how to find local meetings, MAT/treatment access, and SAMHSA 1-800-662-4357. Encouraging, judgment-free." },
-    { id: "childcare", label: "Childcare", glyph: "*", priority: 2,
-      guide: "Childcare options for a relocating/traveling family here: types available, typical wait/cost reality, and how to find licensed care (state referral / Child Care Aware). Honest about availability." },
-    { id: "schools", label: "Schools", glyph: "#", priority: 2,
-      guide: "Public school picture for this area: which districts/schools are well-regarded, any to research carefully, and how enrollment works for a mid-year move. Frame as 'research these' rather than absolute judgments." },
     { id: "housing", label: "Housing & Rentals", glyph: "^", priority: 2,
+      teaser: "What rent runs and where to actually look.",
       guide: "Rental reality here: typical rent range, what's available (short-term, RV/extended-stay for traveling workers, family rentals), tight or loose market, and where to look." },
+    { id: "cost", label: "Cost & Wages", glyph: "$", priority: 3,
+      teaser: "What a paycheck stretches to, and trade pay here.",
+      guide: "Cost-of-living and trade-wage reality here vs. national: is it cheaper or pricier, typical construction-trade pay in this market, and what a paycheck stretches to. Ballpark and honest." },
+    // — Family & belonging —
+    { id: "schools", label: "Schools", glyph: "#", priority: 2,
+      teaser: "Districts worth a look and how mid-year enrollment works.",
+      guide: "Public school picture for this area: which districts/schools are well-regarded, any to research carefully, and how enrollment works for a mid-year move. Frame as 'research these' rather than absolute judgments." },
+    { id: "childcare", label: "Childcare", glyph: "*", priority: 2,
+      teaser: "Real options, wait times, and what it costs.",
+      guide: "Childcare options for a relocating/traveling family here: types available, typical wait/cost reality, and how to find licensed care (state referral / Child Care Aware). Honest about availability." },
+    { id: "community", label: "Community & Meetups", glyph: "o", priority: 3,
+      teaser: "How to plug in and not be the new stranger.",
+      guide: "How a newcomer plugs in here: trades/union halls, churches and community centers, rec leagues, family meetups, and online local groups. Concrete ways to not be isolated." },
+    // — Day to day —
     { id: "groceries", label: "Groceries & Essentials", glyph: "=", priority: 3,
+      teaser: "Where to stock up without driving an hour.",
       guide: "Where to get groceries and everyday essentials here: major chains present, distance if rural, and any notable local option. Practical." },
     { id: "furniture", label: "Getting Set Up", glyph: "[]", priority: 3,
+      teaser: "Furnish a place fast without going broke.",
       guide: "Furnishing a place fast on a budget here: furniture/secondhand options, where families find free/cheap furniture (Buy Nothing, marketplace, thrift), and quick setup tips for a temporary or new home." },
     { id: "recreation", label: "Things To Do", glyph: ">", priority: 3,
+      teaser: "What a weekend looks like around here.",
       guide: "What there is to do here for workers and families: outdoors, parks, notable nearby recreation, and the kind of weekend this area offers. Real and specific to the geography." },
-    { id: "community", label: "Community & Meetups", glyph: "o", priority: 3,
-      guide: "How a newcomer plugs in here: trades/union halls, churches and community centers, rec leagues, family meetups, and online local groups. Concrete ways to not be isolated." },
-    { id: "cost", label: "Cost & Wages", glyph: "$", priority: 3,
-      guide: "Cost-of-living and trade-wage reality here vs. national: is it cheaper or pricier, typical construction-trade pay in this market, and what a paycheck stretches to. Ballpark and honest." }
+    // — Support & awareness —
+    { id: "mental", label: "Mental Health", glyph: "~", priority: 1,
+      teaser: "Someone to talk to — free, private, any hour.",
+      guide: "Mental health support relevant to construction workers and families here: county behavioral-health access, sliding-scale/community clinics, and the national crisis lines (always include 988). Plainspoken, no stigma." },
+    { id: "recovery", label: "Recovery & Meetings", glyph: "@", priority: 1,
+      teaser: "Meetings and clean-time support near the job.",
+      guide: "Addiction recovery support near here: AA/NA meeting availability, how to find local meetings, MAT/treatment access, and SAMHSA 1-800-662-4357. Encouraging, judgment-free." },
+    { id: "hazards", label: "Local Hazards", glyph: "!", priority: 1,
+      teaser: "The seasonal stuff worth knowing before it bites.",
+      guide: "Region-specific natural & seasonal hazards a newcomer should know: ticks/Lyme, venomous snakes, extreme heat/cold, wildfire smoke, flooding, tornado/hurricane risk, air quality, valley fever, etc. Each item: what it is, WHEN it's worst (season/months), and one concrete way to avoid or prepare. Be specific to this region's actual risk profile." }
   ];
 
   // ---- JSON shape we ask every category to return ----
@@ -75,8 +94,12 @@
   }
 
   // ---- cache (memory + localStorage) ----
+  // Cache is language-scoped so a Spanish briefing never serves cached English.
   const mem = new Map();
-  function cacheKey(placeKey, catId) { return "built2:" + placeKey + ":" + catId; }
+  function cacheKey(placeKey, catId) {
+    var lg = (window.I18N && window.I18N.lang) || "en";
+    return "built2:" + lg + ":" + placeKey + ":" + catId;
+  }
   function readCache(placeKey, catId) {
     const k = cacheKey(placeKey, catId);
     if (mem.has(k)) return mem.get(k);
@@ -139,7 +162,10 @@
       "Do NOT invent specific business names you are not confident about; describe options and what to look for instead.\n\n" +
       "LOCATION: " + ctx + ".\n\n" +
       "TOPIC: " + cat.label + ". Focus: " + cat.guide + "\n\n" +
-      SHAPE;
+      SHAPE +
+      ((window.I18N && window.I18N.lang !== "en")
+        ? ("\n\nIMPORTANT: Write all user-facing strings (headline, titles, details, meta, callout) in " + window.I18N.aiLang() + ". Keep the JSON keys in English.")
+        : "");
 
     try {
       const raw = await window.claude.complete({ messages: [{ role: "user", content: prompt }] });

@@ -35,6 +35,7 @@
             </div>
           </div>
           <div className="right">
+            <a className="ghostbtn" href="rebar.html">{t("nav.rebar")}</a>
             <select className="langsel" value={lang} onChange={e => window.I18N.setLang(e.target.value)} aria-label="Language">
               {window.I18N.LANGS.map(l => <option key={l.code} value={l.code}>{l.label}</option>)}
             </select>

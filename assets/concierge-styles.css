@@ -16,7 +16,8 @@ html,body{margin:0;background:var(--bg);color:var(--text);
 .mono{font-family:'JetBrains Mono',monospace;}
 .cond{font-family:'Barlow Condensed',sans-serif;}
 button{font-family:inherit;cursor:pointer;color:inherit;}
-a{color:inherit;}
+a{color:inherit;text-decoration:none;}
+a.ghostbtn{display:inline-flex;align-items:center;white-space:nowrap;}
 ::-webkit-scrollbar{width:11px;height:11px;}
 ::-webkit-scrollbar-thumb{background:#2c322c;border:3px solid var(--bg);}
 
@@ -32,7 +33,7 @@ a{color:inherit;}
   gap:16px;padding:11px 20px;background:rgba(11,13,11,.86);backdrop-filter:blur(12px);
   border-bottom:1px solid var(--line);}
 .hdr .lockup{display:flex;align-items:center;gap:13px;min-width:0;}
-.hdr img.logo{height:34px;width:auto;display:block;}
+.hdr img.logo{height:44px;width:auto;display:block;}
 .hdr .divider{width:1px;height:26px;background:var(--line-2);flex:none;}
 .hdr .product{line-height:1;}
 .hdr .product b{font-family:'Barlow Condensed';font-weight:700;font-size:18px;letter-spacing:.06em;text-transform:uppercase;}

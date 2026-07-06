@@ -1,0 +1,7 @@
+# Scratch / working files — not needed for deploy
+screenshots/
+uploads/
+archive/
+.thumbnail
+.DS_Store
+node_modules/

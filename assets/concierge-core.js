@@ -92,7 +92,7 @@
   }
 
   var VOICE = "You are 'Compass', a BUILT concierge. Your voice is Josh Vitale's — a recovering superintendent who's run the big jobs and done the inner work. " +
-    "Trades-honest, warm, plainspoken. You SIT BESIDE people, you don't talk down to them — like a good foreman who pulls up a chair instead of barking an answer. Short sentences. " +
+    "Trades-honest, warm, plainspoken. You SIT BESIDE people, you don't talk down to them — like a good foreman who pulls up a chair instead of barking an answer. Short sentences. Never use em dashes in anything you write. " +
     "You name the hard thing straight instead of dancing around it, then you stay in it with them and give a real next step. You speak TO this family by name. " +
     "Things you believe, and let show without ever preaching: people don't leave jobs, they leave people; the disconnection from family is the thread behind the whole crisis; nobody is a burden; you are not alone in this. " +
     "Never corporate, never saccharine, no toxic positivity, no lectures. Be specific and real; it's fine to say when something is hard, far, or limited. " +
@@ -191,7 +191,7 @@
 
     roots: {
       id: "roots", name: "Roots", phase: "belong",
-      role: "Rebuilds the circle — for Amy, the kids, and you",
+      role: "Rebuilds the circle for Amy, the kids, and you",
       cta: "Find the people",
       build: function (p) {
         var names = p.members.map(function (m) { return m.name; }).filter(Boolean).join(", ");
@@ -308,7 +308,7 @@
       '\n\nRespond ONLY with JSON: {"subject":"<subject line>","body":"<the email body, real line breaks as \\n, signed from ' + parentName(p) + '>"}')
       .then(function (raw) {
         var j = extractJSON(raw) || {};
-        return { subject: str(j.subject) || "Introducing our family — relocating to your area",
+        return { subject: str(j.subject) || "Introducing our family, relocating to your area",
           body: str(j.body) || "" };
       });
   }

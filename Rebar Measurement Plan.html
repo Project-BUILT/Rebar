@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Rebar Measurement &amp; Evaluation Plan — Project BUILT</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="" />
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Barlow:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<style>
+doc-page:not(:defined){visibility:hidden}
+body{background:#e8e6e2;font-family:'Barlow',system-ui,sans-serif;color:#1c1e1a;font-size:12pt;line-height:1.55;}
+h1{font-family:'Barlow Condensed';font-weight:700;text-transform:uppercase;font-size:29pt;line-height:1;letter-spacing:.015em;margin:0 0 4pt;}
+h2{font-family:'Barlow Condensed';font-weight:700;text-transform:uppercase;font-size:17pt;letter-spacing:.02em;margin:26pt 0 8pt;border-bottom:2.5pt solid #59a838;padding-bottom:4pt;}
+h3{font-family:'Barlow Condensed';font-weight:700;text-transform:uppercase;font-size:13.5pt;letter-spacing:.02em;margin:16pt 0 4pt;}
+p{margin:0 0 9pt;}
+.kick{font-family:'JetBrains Mono',monospace;font-size:8.5pt;letter-spacing:.24em;text-transform:uppercase;color:#4c8f2f;margin:0 0 10pt;}
+.meta{font-family:'JetBrains Mono',monospace;font-size:8.5pt;color:#6b6f66;letter-spacing:.04em;margin:6pt 0 0;}
+.lede{font-size:12.5pt;color:#3a3d36;}
+table{width:100%;border-collapse:collapse;font-size:10pt;margin:10pt 0 14pt;}
+th{font-family:'JetBrains Mono',monospace;font-size:8pt;letter-spacing:.1em;text-transform:uppercase;text-align:left;color:#6b6f66;border-bottom:1.5pt solid #1c1e1a;padding:5pt 8pt 5pt 0;}
+td{border-bottom:.75pt solid #cfcdc6;padding:6pt 8pt 6pt 0;vertical-align:top;line-height:1.4;}
+td b{font-weight:600;}
+.tagline{font-family:'JetBrains Mono',monospace;font-size:8.5pt;color:#4c8f2f;letter-spacing:.06em;}
+.inst{break-inside:avoid;margin-bottom:6pt;}
+.inst .why{background:#f2f4ee;border-left:3pt solid #59a838;padding:8pt 11pt;font-size:10.5pt;margin:6pt 0 10pt;}
+.cite{font-size:9.5pt;color:#55584f;margin:2pt 0 0;}
+ul{margin:0 0 10pt;padding-left:16pt;}
+li{margin-bottom:4pt;}
+.note{background:#fbf4e2;border-left:3pt solid #d9a016;padding:8pt 11pt;font-size:10.5pt;margin:10pt 0;}
+.ftr{display:flex;justify-content:space-between;font-family:'JetBrains Mono',monospace;font-size:7.5pt;letter-spacing:.1em;text-transform:uppercase;color:#8a8d84;border-top:.75pt solid #cfcdc6;padding-top:6pt;}
+</style>
+</head>
+<body>
+<doc-page size="letter" margin="0.8in">
+  <div slot="footer" class="ftr"><span>Project BUILT · Rebar Measurement &amp; Evaluation Plan</span><span>Internal · July 2026</span></div>
+
+  <p class="kick">Project BUILT · Rebar · For review with Réka</p>
+  <h1>Rebar Measurement &amp; Evaluation Plan</h1>
+  <p class="meta">Draft v1 · July 2026 · Peer-reviewed instruments embedded in the Level Check</p>
+
+  <p class="lede">Rebar's promise is practical: take weight off construction workers and the families behind them. To prove that — to funders, partners, and ourselves — the data we gather has to be built on instruments the research community already trusts. This plan lays out the validated short-form instruments now embedded in Rebar's quarterly <b>Level Check</b>, why each was chosen, how each is scored, and what the readings mean.</p>
+
+  <h2>1 · Design principles</h2>
+  <ul>
+    <li><b>Verbatim items.</b> Each instrument's questions appear word for word (with warm framing <i>around</i> them, never inside them). Changing item wording voids the validation, so we don't.</li>
+    <li><b>Ultra-brief forms.</b> Total burden is 17 items (~10 minutes), using the shortest validated version of each construct. Long batteries kill completion in this population.</li>
+    <li><b>Screen, don't diagnose.</b> Every instrument here is a screener. A flag routes the user to a concrete punchlist action and, where warranted, to 988/SAMHSA — it never labels them.</li>
+    <li><b>Actionable by design.</b> Every domain measured maps to a Rebar scope, so an amber reading always has a next move inside the tool.</li>
+    <li><b>Spanish parity.</b> Validated Spanish translations are used for every instrument, matching Rebar's bilingual UI.</li>
+  </ul>
+
+  <h2>2 · Instrument battery at a glance</h2>
+  <table>
+    <thead><tr><th>Domain</th><th>Instrument</th><th>Items</th><th>Flag threshold</th><th>Routes to</th></tr></thead>
+    <tbody>
+      <tr><td><b>Subjective wellbeing</b></td><td>WHO-5 Well-Being Index</td><td>5</td><td>≤ 50 / 100</td><td>People &amp; Purpose · Your Head</td></tr>
+      <tr><td><b>Depression screen</b></td><td>PHQ-2</td><td>2</td><td>≥ 3 / 6</td><td>Your Head · 988 surfaced</td></tr>
+      <tr><td><b>Anxiety screen</b></td><td>GAD-2</td><td>2</td><td>≥ 3 / 6</td><td>Your Head</td></tr>
+      <tr><td><b>Loneliness / isolation</b></td><td>UCLA Loneliness Scale (3-item)</td><td>3</td><td>≥ 6 / 9</td><td>People &amp; Purpose</td></tr>
+      <tr><td><b>Sleep duration</b></td><td>BRFSS single item</td><td>1</td><td>&lt; 7 hours</td><td>Your Body (auto punch item)</td></tr>
+      <tr><td><b>Financial fragility</b></td><td>FINRA NFCS "$2,000" item</td><td>1</td><td>"Probably/certainly could not"</td><td>The Money</td></tr>
+      <tr><td><b>Alcohol risk</b></td><td>AUDIT-C <span class="tagline">(optional, skippable)</span></td><td>3</td><td>≥ 3 / 12</td><td>Recovery</td></tr>
+    </tbody>
+  </table>
+
+  <h2>3 · The instruments, academically</h2>
+
+  <div class="inst">
+    <h3>WHO-5 Well-Being Index</h3>
+    <p>Five positively-phrased items on the past two weeks, each rated 0–5; the raw sum (0–25) is multiplied by 4 to give a 0–100 score. A score ≤ 50 indicates reduced wellbeing warranting follow-up; ≤ 28 suggests likely depression. The WHO-5 is among the most widely used brief wellbeing measures in the world, with a systematic review of 213 studies supporting its validity as an outcome measure, sensitivity to change over time, and utility as a depression screen. It is free to use and exists in validated translations in over 30 languages, including Spanish.</p>
+    <div class="why"><b>Why for Rebar:</b> it is our primary <i>outcome</i> measure. Positively worded (no deficit framing — important for a stigma-sensitive audience), sensitive to change, and comparable across programs, so retreat cohorts and Rebar users can be tracked on the same scale.</div>
+    <p class="cite">Topp CW, Østergaard SD, Søndergaard S, Bech P. The WHO-5 Well-Being Index: a systematic review of the literature. <i>Psychotherapy and Psychosomatics</i>. 2015;84(3):167–176.</p>
+  </div>
+
+  <div class="inst">
+    <h3>PHQ-2 (Patient Health Questionnaire-2)</h3>
+    <p>The first two items of the PHQ-9 — anhedonia and depressed mood over two weeks — scored 0–3 each. At the standard cutoff of ≥ 3, the PHQ-2 showed 83% sensitivity and 92% specificity for major depressive disorder in the original validation (n = 6,000 primary-care and OB-GYN patients). It is a public-domain screener recommended widely for first-stage screening.</p>
+    <div class="why"><b>Why for Rebar:</b> construction has among the highest suicide rates of any industry; a two-item screen is the least invasive credible way to watch this. We deliberately use the PHQ-2 rather than PHQ-9 to avoid administering a self-harm item in an unmoderated tool; a positive screen surfaces 988 and warm referral language instead.</div>
+    <p class="cite">Kroenke K, Spitzer RL, Williams JB. The Patient Health Questionnaire-2: validity of a two-item depression screener. <i>Medical Care</i>. 2003;41(11):1284–1292.</p>
+  </div>
+
+  <div class="inst">
+    <h3>GAD-2 (Generalized Anxiety Disorder-2)</h3>
+    <p>The two core items of the GAD-7, scored 0–3 each; a cutoff of ≥ 3 yields 86% sensitivity and 83% specificity for generalized anxiety disorder, and performs acceptably as a broader screen for panic, social anxiety, and PTSD.</p>
+    <div class="why"><b>Why for Rebar:</b> anxiety (money, job security, family strain) is the load our users name most often; pairing GAD-2 with PHQ-2 gives the standard, publishable "PHQ-4" style mental-health snapshot at four items total.</div>
+    <p class="cite">Kroenke K, Spitzer RL, Williams JB, Monahan PO, Löwe B. Anxiety disorders in primary care: prevalence, impairment, comorbidity, and detection. <i>Annals of Internal Medicine</i>. 2007;146(5):317–325.</p>
+  </div>
+
+  <div class="inst">
+    <h3>UCLA Loneliness Scale — 3-item short form</h3>
+    <p>Three items (lack companionship, feel left out, feel isolated) rated 1–3; total 3–9, with ≥ 6 commonly used to classify "lonely." Developed for large telephone surveys from the Revised UCLA Loneliness Scale, with satisfactory internal consistency (α ≈ .72) and strong correlation with the full scale. Used in major aging and health studies (e.g., HRS/NSHAP).</p>
+    <div class="why"><b>Why for Rebar:</b> disconnection is Project BUILT's core theory of the crisis — "people don't leave jobs, they leave people." This is the standard brief measure of exactly that construct, and our most important mediating variable: if Rebar works the way we believe, UCLA-3 should move first and mental-health scores should follow.</div>
+    <p class="cite">Hughes ME, Waite LJ, Hawkley LC, Cacioppo JT. A short scale for measuring loneliness in large surveys: results from two population-based studies. <i>Research on Aging</i>. 2004;26(6):655–672.</p>
+  </div>
+
+  <div class="inst">
+    <h3>Sleep duration — BRFSS single item</h3>
+    <p>"On average, how many hours of sleep do you get in a 24-hour period?" — the CDC Behavioral Risk Factor Surveillance System item, enabling direct comparison to national and occupational norms. The joint AASM/Sleep Research Society consensus recommends ≥ 7 hours per night for adults; &lt; 7 hours is associated with impaired safety-critical performance, injury risk, and adverse mental and physical health outcomes.</p>
+    <div class="why"><b>Why for Rebar:</b> sleep is the co-founders' "do you get 7 hours?" question, made comparable to CDC surveillance data. A reading under 7 auto-offers the "Seven hours, protected" punchlist item — the tightest question-to-action loop in the tool. It also mirrors the yes/no body check inside the Body scope, giving a behavioral cross-check.</div>
+    <p class="cite">Watson NF, et al. Recommended amount of sleep for a healthy adult: a joint consensus statement of the American Academy of Sleep Medicine and Sleep Research Society. <i>Sleep</i>. 2015;38(6):843–844. · CDC BRFSS Questionnaire, sleep module.</p>
+  </div>
+
+  <div class="inst">
+    <h3>Financial fragility — FINRA NFCS "$2,000" item</h3>
+    <p>"How confident are you that you could come up with $2,000 if an unexpected need arose within the next month?" — the canonical single-item measure of household financial fragility from the FINRA National Financial Capability Study, introduced by Lusardi, Schneider &amp; Tufano. Respondents answering "probably not" or "certainly not" are classified financially fragile; the item predicts hardship better than income alone because it captures access to all coping resources.</p>
+    <div class="why"><b>Why for Rebar:</b> "the cliff" (income stopping cold between jobs) is the Money scope's central problem. This item measures resilience to exactly that shock, in one question, with a national benchmark to compare our population against.</div>
+    <p class="cite">Lusardi A, Schneider D, Tufano P. Financially fragile households: evidence and implications. <i>Brookings Papers on Economic Activity</i>. Spring 2011:83–134.</p>
+  </div>
+
+  <div class="inst">
+    <h3>AUDIT-C (Alcohol Use Disorders Identification Test — Consumption)</h3>
+    <p>The three consumption items of the WHO's AUDIT, scored 0–4 each (0–12 total). In the original VA validation, ≥ 4 for men (≥ 3 for women) identified heavy drinking and/or active abuse or dependence with performance comparable to the full AUDIT. Because Rebar does not collect gender, we flag conservatively at ≥ 3 with soft, non-judgmental language.</p>
+    <div class="why"><b>Why for Rebar:</b> substance use is one of Project BUILT's four named crisis threads. AUDIT-C is the standard brief consumption screen, and making the section explicitly <i>skippable</i> preserves trust — a skipped section is recorded as missing data, not assumed zero.</div>
+    <p class="cite">Bush K, Kivlahan DR, McDonell MB, Fihn SD, Bradley KA. The AUDIT alcohol consumption questions (AUDIT-C): an effective brief screening test for problem drinking. <i>Archives of Internal Medicine</i>. 1998;158(16):1789–1795.</p>
+  </div>
+
+  <h2>4 · Cadence &amp; how it lives in the product</h2>
+  <ul>
+    <li><b>Baseline:</b> the Level Check is offered from the home screen; the first completion is the user's baseline record.</li>
+    <li><b>Every 90 days:</b> the home card flips to "due" and invites a re-run. Each run is appended to the user's record (<span class="tagline">profile.levels[]</span>), enabling within-person change scores — the design funders actually want (pre/post, not just cross-sectional).</li>
+    <li><b>Daily pulse (Good / Getting by / Rough):</b> retained as a lightweight engagement and momentary-affect signal; it is <i>not</i> a validated instrument and is analyzed only as usage/context data.</li>
+    <li><b>Body quick check (4 yes/no items):</b> behavioral self-report tied directly to punchlist actions; the sleep item cross-checks the BRFSS reading.</li>
+    <li><b>Flag → action:</b> every amber gauge offers one concrete punchlist item, and mood flags surface 988. The measurement layer and the intervention layer are the same surface.</li>
+  </ul>
+
+  <h2>5 · What we can claim with this data</h2>
+  <p>With baseline + quarterly follow-ups we can report, in academically defensible terms: mean WHO-5 change over time (primary outcome); movement across published screening thresholds (PHQ-2, GAD-2, UCLA-3, AUDIT-C); % of users below the 7-hour sleep consensus and their change; and financial-fragility prevalence vs. FINRA national benchmarks. Loneliness (UCLA-3) serves as the hypothesized mediator consistent with Project BUILT's theory of change. Retreat families and Rebar-only users share the same battery, so the retreat's two-year follow-along can be evaluated on the same scales.</p>
+
+  <div class="note"><b>Limitations to state up front:</b> these are self-report screeners, not diagnoses; the sample is self-selected; without a comparison group, change scores show association, not causation. For grant-grade evaluation, a waitlist or staggered-onboarding comparison is the natural next step — worth designing with Réka before the user base grows.</div>
+
+  <h2>6 · Every question, word for word, and where it lives</h2>
+  <p>The exact items as they appear in the product. Level Check items are shown verbatim (English; validated Spanish translations are used when the app is in Spanish). Body check and daily pulse items are our own plain-language items, not validated instruments, and are analyzed as behavioral/engagement data only.</p>
+
+  <h3>A · The Level Check <span class="tagline">(home screen → "Level check" card · at baseline, then every 90 days)</span></h3>
+
+  <table>
+    <thead><tr><th style="width:34%">Section in app</th><th>Items (verbatim)</th><th style="width:26%">Response scale</th></tr></thead>
+    <tbody>
+      <tr>
+        <td><b>"How you've been"</b><br /><span class="tagline">WHO-5 · "Over the last two weeks…"</span></td>
+        <td>1. I have felt cheerful and in good spirits<br />2. I have felt calm and relaxed<br />3. I have felt active and vigorous<br />4. I woke up feeling fresh and rested<br />5. My daily life has been filled with things that interest me</td>
+        <td>All of the time (5) · Most of the time (4) · More than half of the time (3) · Less than half of the time (2) · Some of the time (1) · At no time (0)</td>
+      </tr>
+      <tr>
+        <td><b>"The heavy stuff"</b><br /><span class="tagline">PHQ-2 + GAD-2 · "Over the last two weeks, how often have you been bothered by…"</span></td>
+        <td>1. Little interest or pleasure in doing things <span class="tagline">(PHQ)</span><br />2. Feeling down, depressed, or hopeless <span class="tagline">(PHQ)</span><br />3. Feeling nervous, anxious, or on edge <span class="tagline">(GAD)</span><br />4. Not being able to stop or control worrying <span class="tagline">(GAD)</span></td>
+        <td>Not at all (0) · Several days (1) · More than half the days (2) · Nearly every day (3)</td>
+      </tr>
+      <tr>
+        <td><b>"Your people"</b><br /><span class="tagline">UCLA Loneliness Scale-3</span></td>
+        <td>1. How often do you feel that you lack companionship?<br />2. How often do you feel left out?<br />3. How often do you feel isolated from others?</td>
+        <td>Hardly ever (1) · Some of the time (2) · Often (3)</td>
+      </tr>
+      <tr>
+        <td><b>"Sleep"</b><br /><span class="tagline">BRFSS</span></td>
+        <td>On average, how many hours of sleep do you get in a 24-hour period?</td>
+        <td>Less than 5 · 5 · 6 · 7 · 8 · 9 or more</td>
+      </tr>
+      <tr>
+        <td><b>"Money"</b><br /><span class="tagline">FINRA NFCS</span></td>
+        <td>How confident are you that you could come up with $2,000 if an unexpected need arose within the next month?</td>
+        <td>I'm certain I could (0) · I could probably (1) · I probably could not (2) · I'm certain I could not (3)</td>
+      </tr>
+      <tr>
+        <td><b>"Drinking"</b><br /><span class="tagline">AUDIT-C · optional, skippable</span></td>
+        <td>1. How often do you have a drink containing alcohol?<br />2. How many standard drinks do you have on a typical day when you are drinking?<br />3. How often do you have six or more drinks on one occasion?</td>
+        <td>Q1: Never (0) · Monthly or less (1) · 2–4 times a month (2) · 2–3 times a week (3) · 4+ times a week (4)<br />Q2: 1–2 (0) · 3–4 (1) · 5–6 (2) · 7–9 (3) · 10 or more (4)<br />Q3: Never (0) · Less than monthly (1) · Monthly (2) · Weekly (3) · Daily or almost daily (4)</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h3>B · Body quick check <span class="tagline">(inside the "Your Body" scope sheet · yes/no · each miss auto-adds a punchlist item)</span></h3>
+  <table>
+    <thead><tr><th style="width:47%">Worker version</th><th style="width:47%">Home-front (spouse) version</th><th>Adds item on</th></tr></thead>
+    <tbody>
+      <tr><td>Most nights, do you get at least 7 hours of sleep?</td><td>Are you getting at least 7 hours of sleep most nights?</td><td>No</td></tr>
+      <tr><td>Does real food and water carry your shift, or is it mostly gas-station carbs?</td><td>Do you eat a real meal yourself most days, not just the crusts off their plates?</td><td>No</td></tr>
+      <tr><td>Do you loosen up your hips, back, and shoulders most days?</td><td>Does dinner run on a system, not a 5pm scramble?</td><td>No</td></tr>
+      <tr><td>Are you pushing through pain right now?</td><td>Have you had your own checkup in the last year?</td><td>Yes (worker) / No (spouse)</td></tr>
+    </tbody>
+  </table>
+  <p class="cite">These are behavioral self-report items in the product's own voice, not a validated scale. The sleep item deliberately mirrors the BRFSS Level Check reading, giving a behavioral cross-check between the two.</p>
+
+  <h3>C · Daily pulse <span class="tagline">(shown once per day at sign-in)</span></h3>
+  <p>"How are you doing today?" with three options: <b>Good · Getting by · Rough</b>. "Rough" surfaces 988 and peer support immediately. Analyzed as engagement and momentary-affect context only; it is not a validated instrument and feeds no scores.</p>
+
+  <h2>7 · Data governance</h2>
+  <ul>
+    <li>In the current prototype, responses persist only in the user's own account (local device storage); nothing is transmitted.</li>
+    <li>Production plan: item-level responses stored against the account; Project BUILT staff and research partners see only de-identified, aggregated exports. No individual scores are ever shown to employers, foremen, or crews — this is stated in-product.</li>
+    <li>Consent language for research use of aggregate data should be added at account creation before any aggregate reporting; IRB or ethics review advisable before publication.</li>
+    <li>All instruments used are free for use (public domain or freely licensed); no licensing fees apply.</li>
+  </ul>
+</doc-page>
+<script src="assets/doc-page.js"></script>
+</body>
+</html>

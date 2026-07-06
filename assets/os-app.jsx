@@ -1,9 +1,12 @@
 /* ============================================================
-   REBAR — by Project BUILT. Worker + family OS (v1 teaser).
-   Compass is the in-app guide. Live help via window.claude.
+   REBAR — by Project BUILT. The PM for the job that matters most.
+   Shared data + shell components. Bilingual via window.I18N
+   (assets/i18n.js + i18n-extra.js) — static strings come from
+   the rb.* pack; live PM output follows I18N.aiLang().
    ============================================================ */
 const { useState, useEffect, useRef } = React;
-const LS = "rebar:v1";
+const LS = "rebar:v2";
+const T = (k,v)=>window.I18N.t(k,v);
 
 function openExt(e, url){ e&&e.preventDefault(); const w=window.open(url,"_blank","noopener,noreferrer"); if(!w){try{location.assign(url);}catch(_){}} }
 function load(){ try{ return JSON.parse(localStorage.getItem(LS))||null; }catch(_){ return null; } }
@@ -13,7 +16,11 @@ function save(s){ try{ localStorage.setItem(LS, JSON.stringify(s)); }catch(_){} 
 function extractJSON(t){ if(!t) return null; t=String(t).trim().replace(/^```(?:json)?/i,"").replace(/```$/i,"").trim(); const s=t.indexOf("{"),e=t.lastIndexOf("}"); if(s<0||e<0) return null; let x=t.slice(s,e+1); try{return JSON.parse(x);}catch(_){} try{return JSON.parse(x.replace(/,\s*([}\]])/g,"$1"));}catch(_){} return null; }
 // Uses the in-app helper when running inside the design preview; falls back to
 // the Netlify serverless function (/.netlify/functions/chat) once deployed.
+// Every prompt picks up the user's language so live output matches the UI.
 async function ask(prompt){
+  if (window.I18N && window.I18N.lang !== "en") {
+    prompt += "\n\nIMPORTANT: Write every user-facing string of your response in " + window.I18N.aiLang() + " — plainspoken, trades voice. If responding in JSON, keep the JSON keys in English.";
+  }
   if (window.claude && typeof window.claude.complete === "function") {
     return window.claude.complete({ messages:[{ role:"user", content:prompt }] });
   }
@@ -27,94 +34,79 @@ async function ask(prompt){
   return data.text || "";
 }
 
-const VOICE = "You are Compass, a guide inside Rebar — a tool from Project BUILT for construction workers and their families. " +
-  "Your voice is a recovering superintendent's: trades-honest, warm, plainspoken, short sentences. You sit beside people, never talk down. " +
-  "Name the hard thing, then give a real next step. Believe: people don't leave jobs they leave people; disconnection is the thread behind the crisis; nobody is a burden; you're not alone. No corporate talk, no fluff, never mention AI.\n\n";
+// ---- THE PM: one honest voice for the whole tool ----
+const PM_VOICE = "You are the PM inside Rebar — a free tool from Project BUILT for construction workers and their families. " +
+  "You are a tool built by people who live this life. If anyone asks what you are, say it straight: 'I'm the PM — the part of Rebar that works your list.' Never claim to be a person. Never mention AI. " +
+  "VOICE: a warm, plainspoken project manager who came up through the trades. Conversational, like a good friend who happens to run jobs. Use contractions and an easy rhythm. Zero corporate talk, zero lectures, zero therapy-speak. Never use em dashes. You sit on the same side of the table. " +
+  "BELIEFS: people don't leave jobs, they leave people; disconnection is the thread behind the crisis; nobody is a burden; every problem has a next move.\n\n";
 
-// ---- founder personas for 1:1 chat ----
-const PERSONAS = {
-  josh:{ name:"Josh",
-    who:"Josh Vitale, co-founder of Project BUILT and a senior project superintendent who has spent years on the road, in jobsite hotels, away from his wife Amy and their kids",
-    voice:"Trades-honest, warm, plainspoken. Short sentences. You've lived the per-diem life, the isolation, the dark days. You sit beside him, shoulder to shoulder, never above him.",
-    greeting:"Glad you're here. I'm Josh — I've spent more nights in a jobsite hotel away from my family than I can count, so I'm not going to feed you anything fake. Real quick: what's the one thing pulling at you hardest right now?" },
-  amy:{ name:"Amy",
-    who:"Amy Vitale, co-founder of Project BUILT and the partner who holds the family together while Josh is on the road — splitting time across states, raising the kids, keeping the circle alive",
-    voice:"Warm, steady, been-there. You speak partner-to-partner. You know the loneliness of holding down the home front and the worry that rides along with loving someone who's always gone.",
-    greeting:"Hey — I'm Amy. I've held things together at home with Josh a thousand miles away, so I get this from your side of it. Tell me straight: what's the hardest part for you right now?" }
-};
-function personaPrompt(p, profile){
+function pmGreeting(profile){
+  return (profile && profile.builder==="spouse") ? T("rb.pm.greetSpouse") : T("rb.pm.greetWorker");
+}
+function pmPrompt(profile){
   const who = (profile.home||[]).join(", ") || "their people";
   const them = profile.builder==="spouse"
-    ? ("someone supporting "+(profile.worker||"their worker")+", a "+(profile.role||"construction worker"))
-    : ("a "+(profile.role||"construction worker"));
-  return "You are "+p.who+". You are talking one-on-one, inside Rebar, with "+them+" who is "+(profile.site?("working at "+profile.site):"working away from home")+". At home: "+who+".\n\n"+
-    "VOICE: "+p.voice+" Believe: people don't leave jobs, they leave people; disconnection is the thread behind the crisis; nobody is a burden; you're not alone. No corporate talk, no fluff. Never say you are an AI — you are "+p.name+".\n\n"+
-    "YOUR JOB in this chat: find the LOW-HANGING FRUIT — the single easiest thing pulling at them — then deliver real, concrete solutions. Ask ONE question at a time. Keep every reply short (1-4 sentences, plain text, no labels or markdown). When you have enough, offer 2-3 specific next steps. Name the hard thing, then give the real move.";
+    ? ("someone holding the home front for "+(profile.worker||"a worker")+" in construction")
+    : ("a construction worker"+(profile.role?(" — "+profile.role):""));
+  const away = profile.travels===true ? " The work takes them away from home." : (profile.travels===false ? " They're home most nights." : "");
+  return PM_VOICE +
+    "You're in a one-on-one with "+them+(profile.site?(", work is at "+profile.site):"")+"."+away+" At home: "+who+".\n\n"+
+    "YOUR JOB in this chat: work like a good PM. Find the LOW-HANGING FRUIT — the single easiest thing to take off their back — across purpose, people, the job itself, a rough boss or coworker, money, the body. NEVER assume a problem they haven't named — follow what THEY bring up. " +
+    "Keep every reply short: 1-4 sentences, plain text, no labels, no markdown. Give the concrete move FIRST when you have one, then at most ONE sharp practical question if you need more. Never ask how something makes them feel. " +
+    "When it's beyond the tool, refer without drama: 988 for crisis (say it like a jobsite number, not a warning), SAMHSA 1-800-662-4357 for drinking or using, Project BUILT for family support. Every reply ends with a move.";
 }
 
 // ---- crisis (real, national) ----
 const CRISIS = [
-  { name:"988 Suicide & Crisis Lifeline", num:"988", note:"Call or text, 24/7", tel:"988" },
-  { name:"SAMHSA National Helpline", num:"1-800-662-4357", note:"Free treatment referral, 24/7", tel:"18006624357" },
-  { name:"Crisis Text Line", num:"Text HOME to 741741", note:"Text-based support, 24/7", tel:"" },
-  { name:"Emergency", num:"911", note:"Immediate danger", tel:"911" }
+  { id:"c988", name:"988 Suicide & Crisis Lifeline", num:"988", tel:"988" },
+  { id:"csam", name:"SAMHSA National Helpline", num:"1-800-662-4357", tel:"18006624357" },
+  { id:"ctext", name:"Crisis Text Line", num:"Text HOME to 741741", tel:"" },
+  { id:"c911", name:"Emergency", num:"911", tel:"911" }
 ];
 const FUND = { donate:"https://givebutter.com/ProjectBUILT", volunteer:"https://getbuilt.org/volunteer/", site:"https://getbuilt.org/" };
 
-// ---- rooms: driver + real partner depth ----
+// ---- the punchlist: six scopes, practical first ----
+// Display strings live in i18n (rb.room.* / rb.pl.*); this holds structure.
 const ROOMS = [
-  { id:"connection", glyph:"◇", name:"Connection", driver:"Isolation", status:"open",
-    line:"Stay close to your people. Beat the thing that does the real damage.",
-    partner:"Project BUILT + Proactive Conversations" },
-  { id:"mind", glyph:"~", name:"Your Head", driver:"Mental health", status:"open",
-    line:"The stress, the dark days, and real help that's one tap away.",
-    partner:"Empower Work · 988" },
-  { id:"recovery", glyph:"@", name:"Recovery", driver:"Drinking & using", status:"soon",
-    line:"Staying clean on the road. Cravings, meetings, no judgment.",
-    partner:"SAFE Project · SAMHSA" },
-  { id:"body", glyph:"+", name:"Your Body", driver:"Sleep · pain · burnout", status:"soon",
-    line:"Sleep, real food, and not grinding yourself into the ground.",
-    partner:"Recharge · Vimocity" },
-  { id:"work", glyph:"=", name:"The Job", driver:"Bad bosses · purpose", status:"soon",
-    line:"Toxic supers, burnout, and remembering why you do this.",
-    partner:"Mission Mindset · Confyde" },
-  { id:"money", glyph:"$", name:"The Money", driver:"The cliff", status:"soon",
-    line:"Don't get caught flat when the job dries up. Build the cushion.",
-    partner:"Flying V Financial" },
-  { id:"travel", glyph:">", name:"The Next Spot", driver:"Travel & the move", status:"open",
-    line:"Scout the next town and land your family soft. We built this one.",
-    partner:"Compass" }
+  { id:"people", status:"open", partner:"Your PM · Project BUILT" },
+  { id:"travel", status:"open", partner:"BUILT Compass" },
+  { id:"body", status:"partner", partner:"Vimocity" },
+  { id:"money", status:"soon", partner:"Flying V Financial" },
+  { id:"mind", status:"open", partner:"Empower Work · 988" },
+  { id:"recovery", status:"soon", partner:"SAFE Project · SAMHSA" }
 ];
-
-// ---- the Vitale founders' story ----
-const FOUNDERS = {
-  name:"Josh", builder:"worker", founders:true,
-  worker:"Josh", role:"Senior Project Superintendent",
-  site:"Project Lighthouse — Vantage data center, Port Washington, WI",
-  home:["Partner — Amy","Kids — Gavin, Evan, Ryla","Daughter — Kaylyn (20)"],
-  story:"We're Josh & Amy Vitale — we started Project BUILT. Right now Josh is on-site in Wisconsin while Amy splits time between here and Arizona, the boys come for the summer, and our oldest holds down the house back home. We're navigating Gavin's therapy across state lines, rebuilding a circle we spent years building, and staying close across a thousand miles. We built Rebar because we needed it. You're not the only one in it.",
-  shortStory:"We started Project BUILT, and we're living the same thing you are. Josh is on-site in Wisconsin; Amy splits time with Arizona; the boys come for summers and our oldest, Kaylyn, holds down the house back home. When everything got shaken up, we realized how much help we needed that just wasn't there — so we built Rebar. Here's what we're actually doing, room by room.",
-  snapshot:[
-    { room:"connection", state:"Every day", note:"A daily video call and texts all day. We alternate who reaches out — some nights Josh calls at his late bedtime, some mornings an early call wakes Amy when he's heading to work — so the strain stays even. We stay honest about the bad days and co-regulate through them; learning to set boundaries has helped, and we're still at it." },
-    { room:"travel", state:"Twice a month", note:"Josh flies back for a long weekend twice a month, and Amy and the kids are up in Wisconsin with him for the summer." },
-    { room:"mind", state:"The deep work", note:"We're recovering from tough childhoods and generational trauma. It's a ton of work, sometimes ugly — but it's so worth it." },
-    { room:"recovery", state:"A lifestyle", note:"We're both in individual therapy and couples therapy, and we do support groups every week or month. Recovery is a lifestyle for us." },
-    { room:"body", state:"Getting there", note:"Josh aims for seven hours a night; with a toddler that's harder for Amy, but we're getting better. We do chef-prepared organic meals to lighten the load and actually eat well." },
-    { room:"money", state:"Locked in", note:"Maxing out the 401(k) and HSA, keeping a real emergency fund, and working with a money manager so the gap between jobs never blindsides us." }
-  ]
-};
+const PL_COUNT = { people:4, body:4, mind:4, money:4, recovery:4, travel:3 };
+// spouse/home-front sees its own copy for every scope (rb.*S / rb.pls.*)
+function sfx(role){ return role==="spouse" ? "S" : ""; }
+function roomName(id){ return T("rb.room."+id+".name"); }
+function roomDriver(id, role){ return T("rb.room."+id+".driver"+sfx(role)); }
+function roomLine(id, role){ return T("rb.room."+id+".line"+sfx(role)); }
+function sheetLede(id, role){ return T("rb.sheet."+id+".lede"+sfx(role)); }
+// per-scope best-practice items, in the current language, for the current role
+function plItems(id, role){
+  const p = role==="spouse" ? "rb.pls." : "rb.pl.";
+  const n = PL_COUNT[id]||0; const out=[];
+  for(let i=0;i<n;i++) out.push({ t:T(p+id+"."+i+".t"), d:T(p+id+"."+i+".d"), tag:T(p+id+"."+i+".tag") });
+  return out;
+}
+// who the PM is helping, for live prompts (day plans, how-tos)
+function personLine(profile){
+  return profile.builder==="spouse"
+    ? ("PERSON: the partner holding the home front while "+(profile.worker||"a construction worker")+" is away for work. At home with them: "+((profile.home||[]).join(", ")||"the family")+".")
+    : ("PERSON: "+(profile.role||"a construction worker")+", working at "+(profile.site||"the jobsite")+"."+(profile.travels===true?" The work takes them away from home.":profile.travels===false?" They're home most nights.":""));
+}
 
 function Hex({size,cls}){ return (
   <svg className={cls} width={size} height={size} viewBox="0 0 100 100" fill="none">
-    <polygon points="50,4 91,27 91,73 50,96 9,73 9,27" stroke="#6dd441" strokeWidth="3"/>
+    <polygon points="50,4 91,27 91,73 50,96 9,73 9,27" stroke="var(--green)" strokeWidth="3"/>
     <polygon points="50,16 80,33 80,67 50,84 20,67 20,33" stroke="#4a514a" strokeWidth="2.5"/>
-    <line x1="50" y1="26" x2="50" y2="74" stroke="#6dd441" strokeWidth="4"/>
-    <line x1="33" y1="38" x2="33" y2="62" stroke="#6dd441" strokeWidth="3"/>
-    <line x1="67" y1="38" x2="67" y2="62" stroke="#6dd441" strokeWidth="3"/>
+    <line x1="50" y1="26" x2="50" y2="74" stroke="var(--green)" strokeWidth="4"/>
+    <line x1="33" y1="38" x2="33" y2="62" stroke="var(--green)" strokeWidth="3"/>
+    <line x1="67" y1="38" x2="67" y2="62" stroke="var(--green)" strokeWidth="3"/>
   </svg>
 ); }
 
-function Header({ onHelp, onReset, showReset }){
+function Header({ onHelp, onReset, showReset, punchCount, onPunch, onPM }){
   return (
     <div className="hdr">
       <div className="lock">
@@ -122,12 +114,17 @@ function Header({ onHelp, onReset, showReset }){
         <div className="div"></div>
         <div>
           <div className="wordmark"><span className="r">RE</span>BAR</div>
-          <div className="sub">By Project BUILT</div>
+          <div className="sub">{T("rb.sub")}</div>
         </div>
       </div>
       <div className="right">
-        {showReset && <button className="ghost" onClick={onReset}>Start over</button>}
-        <button className="helpbtn" onClick={onHelp}><span className="pulse"></span> Get Help Now</button>
+        <select className="langsel" value={window.I18N.lang} onChange={e=>window.I18N.setLang(e.target.value)} aria-label="Language">
+          {window.I18N.LANGS.filter(l=>l.code==="en"||l.code==="es").map(l=><option key={l.code} value={l.code}>{l.label}</option>)}
+        </select>
+        {showReset && <button className="ghost" onClick={onReset}>{T("rb.startover")}</button>}
+        {onPM && <button className="ghost" onClick={onPM}>{T("rb.pm.name")}</button>}
+        {onPunch && <button className="ghost punchbtn" onClick={onPunch}>{T("rb.mylist")}{punchCount>0 && <span className="pcount">{punchCount}</span>}</button>}
+        <button className="helpbtn" onClick={onHelp}><span className="pulse"></span> {T("rb.help")}</button>
       </div>
     </div>
   );
@@ -137,15 +134,15 @@ function Crisis({ onClose }){
   return (
     <div className="overlay" onClick={onClose}>
       <div className="modal" onClick={e=>e.stopPropagation()}>
-        <h3>You're not alone on this</h3>
-        <p className="ms">If you or someone with you is struggling, reach out right now. Free, confidential, built for people in the trades — any hour.</p>
+        <h3>{T("rb.crisis.title")}</h3>
+        <p className="ms">{T("rb.crisis.ms")}</p>
         {CRISIS.map((l,i)=>(
           <div className="crow" key={i}>
-            <div><div className="cn">{l.name}</div><div className="cnote">{l.note}</div></div>
+            <div><div className="cn">{l.name}</div><div className="cnote">{T("rb.crisis.note."+l.id)}</div></div>
             {l.tel ? <a href={"tel:"+l.tel}>{l.num}</a> : <a className="txt" href="sms:741741?&body=HOME">{l.num}</a>}
           </div>
         ))}
-        <div style={{padding:"6px 22px 18px"}}><button className="btn line" style={{width:"100%"}} onClick={onClose}>Close</button></div>
+        <div style={{padding:"6px 22px 18px"}}><button className="btn line" style={{width:"100%"}} onClick={onClose}>{T("rb.close")}</button></div>
       </div>
     </div>
   );
@@ -171,97 +168,30 @@ function Auth({ onAuthed }){
       <div className="app-bg"></div>
       <img src="assets/built-badge.png" alt="Project BUILT" className="authbadge" />
       <h1 className="authwm"><span className="r">RE</span>BAR</h1>
-      <div className="authtag">The steel inside.</div>
-      <p className="authlede">Make an account so your plans, your people, and your progress are saved and here every time you come back.</p>
+      <div className="authtag">{T("rb.tag")}</div>
+      <p className="authlede">{T("rb.auth.lede")}</p>
       {mode==="choose" ? (
         <div className="authbox">
           {SOCIALS.map(s=>(
             <button key={s.id} className="sbtn" onClick={()=>social(s)} disabled={!!busy}>
               {busy===s.id ? <span className="spinner"></span> : <span className="smk">{s.mark}</span>}
-              <span>{busy===s.id ? ("Connecting to "+s.brand+"\u2026") : ("Continue with "+s.brand)}</span>
+              <span>{busy===s.id ? T("rb.auth.connecting",{brand:s.brand}) : T("rb.auth.continue",{brand:s.brand})}</span>
             </button>
           ))}
-          <div className="author"><span>or</span></div>
-          <button className="sbtn" onClick={()=>setMode("email")} disabled={!!busy}><span className="smk">@</span><span>Continue with email</span></button>
-          <p className="authnote">We pull only your name &amp; email to set you up faster — you fill in the rest, and you control it. Nothing is ever shared or sold.</p>
+          <div className="author"><span>{T("rb.auth.or")}</span></div>
+          <button className="sbtn" onClick={()=>setMode("email")} disabled={!!busy}><span className="smk">@</span><span>{T("rb.auth.email")}</span></button>
+          <p className="authnote">{T("rb.auth.note")}</p>
         </div>
       ) : (
         <form className="authbox" onSubmit={emailSubmit}>
-          <div className="fld"><label>Email</label><input type="email" value={email} onChange={e=>setEmail(e.target.value)} placeholder="you@email.com" autoFocus /></div>
-          <div className="fld"><label>Password</label><input type="password" value={pw} onChange={e=>setPw(e.target.value)} placeholder="Create a password" /></div>
-          <button className="btn" type="submit" style={{width:"100%"}}>Create account &amp; continue</button>
-          <button type="button" className="authback" onClick={()=>setMode("choose")}>← Back to all options</button>
+          <div className="fld"><label>{T("rb.auth.emailLabel")}</label><input type="email" value={email} onChange={e=>setEmail(e.target.value)} placeholder={T("rb.auth.phEmail")} autoFocus /></div>
+          <div className="fld"><label>{T("rb.auth.pw")}</label><input type="password" value={pw} onChange={e=>setPw(e.target.value)} placeholder={T("rb.auth.phPw")} /></div>
+          <button className="btn" type="submit" style={{width:"100%"}}>{T("rb.auth.create")}</button>
+          <button type="button" className="authback" onClick={()=>setMode("choose")}>{T("rb.auth.back")}</button>
         </form>
       )}
     </div>
   );
 }
 
-// ---------- ENTRY ----------
-function Entry({ onPick, auth }){
-  return (
-    <div className="entry">
-      <div className="app-bg"></div>
-      <img src="assets/built-badge.png" alt="Project BUILT" className="bighex" />
-      <div className="kicker">{auth ? "You're signed in · Free, always" : "A Project BUILT tool · Free, always"}</div>
-      <h1><span className="r">RE</span>BAR</h1>
-      <div className="tag">The steel inside.</div>
-      <p className="lede">{auth ? "You're in. Now — who are we setting this up for?" : "One place for the worker and the family behind them — to stay connected, stay standing, and not do the hard parts alone."}</p>
-      <div className="choices">
-        <button className="choice" onClick={()=>onPick("worker")}>
-          <div className="ci">I</div>
-          <div><b>I'm the worker</b><span>Set up for yourself — your people, your days, your head.</span></div>
-        </button>
-        <button className="choice" onClick={()=>onPick("spouse")}>
-          <div className="ci">♥</div>
-          <div><b>I'm building this for someone I love</b><span>Set it up for the worker in your life.</span></div>
-        </button>
-        <button className="choice alt" onClick={()=>onPick("founders")}>
-          <div className="ci">★</div>
-          <div><b>See how the founders are doing it</b><span>Walk through what Josh &amp; Amy are navigating right now.</span></div>
-        </button>
-      </div>
-      <div className="foot">Built by <b>Project BUILT</b> · Together we build · Together we thrive</div>
-    </div>
-  );
-}
-
-// ---------- PROFILE ----------
-const HOME_OPTS = ["Just me","A partner","Kids at home","A parent","Someone in recovery with me"];
-const HOME_OPTS_SPOUSE = ["Just me","Our kids","A parent I care for","Someone in recovery with us"];
-function Profile({ builder, auth, onDone }){
-  const worker = builder==="worker";
-  const homeOpts = worker ? HOME_OPTS : HOME_OPTS_SPOUSE;
-  const homeLabel = worker ? "Who's at home?" : "Who's home while they're on the road?";
-  const [f,setF] = useState({ name:(auth&&auth.name)||"", worker:"", role:"", site:"", home:[] });
-  function tog(o){ setF(s=>({ ...s, home: s.home.includes(o)? s.home.filter(x=>x!==o): [...s.home,o] })); }
-  function submit(e){ e.preventDefault();
-    const profile = {
-      ...(auth||{}),
-      builder, founders:false,
-      name: f.name.trim() || "there",
-      worker: worker ? (f.name.trim()||"you") : (f.worker.trim()||"your worker"),
-      role: f.role.trim(), site: f.site.trim(),
-      home: f.home.length? f.home : ["Just me"]
-    };
-    onDone(profile);
-  }
-  return (
-    <div className="formwrap">
-      <div className="app-bg"></div>
-      <form className="formcard" onSubmit={submit}>
-        <h2>{worker ? "Let's get you set up" : "Let's set them up"}</h2>
-        <p className="h2sub">{worker ? "Just enough so we can actually be useful — not a form for its own sake." : "A few things about the worker in your life, and you, so the help is real."}</p>
-        {auth && auth.pulled && <div className="pulled">Connected via {auth.provider}. We filled in what we could — fix anything that's off.</div>}
-        <div className="fld"><label>{worker?"Your name":"Your name"}</label><input value={f.name} onChange={e=>setF({...f,name:e.target.value})} placeholder={worker?"First name":"Your first name"} autoFocus /></div>
-        {!worker && <div className="fld"><label>Their name</label><input value={f.worker} onChange={e=>setF({...f,worker:e.target.value})} placeholder="The worker's first name" /></div>}
-        <div className="fld"><label>{worker?"Your trade / role":"Their trade / role"}</label><input value={f.role} onChange={e=>setF({...f,role:e.target.value})} placeholder="e.g. Superintendent, electrician, operator" /></div>
-        <div className="fld"><label>Where's the work right now?</label><input value={f.site} onChange={e=>setF({...f,site:e.target.value})} placeholder="Jobsite, town, or 'home for now'" /></div>
-        <div className="fld"><label>{homeLabel}</label><div className="chips">{homeOpts.map(o=>(<button type="button" key={o} className={"chip"+(f.home.includes(o)?" on":"")} onClick={()=>tog(o)}>{o}</button>))}</div></div>
-        <button className="btn" type="submit" style={{width:"100%",marginTop:6}}>Open my Rebar</button>
-      </form>
-    </div>
-  );
-}
-
-window.RebarParts = { openExt, ask, extractJSON, VOICE, PERSONAS, personaPrompt, CRISIS, FUND, ROOMS, FOUNDERS, Hex, Header, Crisis, Auth, Entry, Profile, load, save };
+window.RebarParts = { openExt, ask, extractJSON, PM_VOICE, pmGreeting, pmPrompt, personLine, CRISIS, FUND, ROOMS, PL_COUNT, plItems, roomName, roomDriver, roomLine, sheetLede, Hex, Header, Crisis, Auth, load, save, T };

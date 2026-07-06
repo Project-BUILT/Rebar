@@ -56,13 +56,12 @@
     var when = basics.when ? ("Timing: " + basics.when + ". ") : "";
     var f = fork === "moving" ? "The whole family is relocating together."
       : fork === "staying" ? "The worker goes ahead; the family holds home for now."
-      : "Splitting it — some on-site, some at home, for now.";
+      : "Splitting it: some on-site, some at home, for now.";
     return when + f;
   }
 
   function Intake({ onDone, onHelp }) {
     window.useLang();
-    const base = window.CONCIERGE.DEFAULT_PROFILE;
     const [msgs, setMsgs] = useState([]);
     const [typing, setTyping] = useState(false);
     const [step, setStep] = useState("intro");
@@ -95,11 +94,6 @@
 
     useEffect(() => { const el = bodyRef.current; if (el) el.scrollTop = el.scrollHeight; }, [msgs, typing, step]);
 
-    function pickVitale() {
-      meSay(T("vitale.me"));
-      setDraft(base);
-      aiSay([T("vitale.ai1"), T("vitale.ai2")], () => setStep("fork"));
-    }
     function startCustom() {
       meSay(T("custom.me"));
       aiSay([T("custom.ai1"), T("custom.ai2")], () => setStep("custom"));
@@ -162,8 +156,7 @@
           <div className="cfoot">
             {step === "who" && (
               <div className="qchips">
-                <button className="qchip" onClick={pickVitale}>{T("who.vitale")}</button>
-                <button className="qchip alt" onClick={startCustom}>{T("who.diff")}</button>
+                <button className="qchip" onClick={startCustom}>{T("who.start")}</button>
               </div>
             )}
 
