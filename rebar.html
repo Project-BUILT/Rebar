@@ -42,10 +42,6 @@ a{color:inherit;text-decoration:none;}
   padding:11px 20px;background:rgba(11,13,11,.86);backdrop-filter:blur(12px);border-bottom:1px solid var(--line);}
 .lock{display:flex;align-items:center;gap:12px;min-width:0;}
 .lock img{height:44px;}
-.lock .div{width:1px;height:24px;background:var(--line-2);}
-.wordmark{font-family:'Barlow Condensed';font-weight:700;font-size:21px;letter-spacing:.14em;text-transform:uppercase;line-height:1;}
-.wordmark .r{color:var(--green);}
-.lock .sub{font-family:'JetBrains Mono';font-size:8px;letter-spacing:.26em;color:var(--muted);text-transform:uppercase;margin-top:3px;}
 .hdr .right{display:flex;align-items:center;gap:9px;}
 .helpbtn{display:flex;align-items:center;gap:8px;background:var(--coral);color:#fff;border:none;padding:9px 14px 8px;white-space:nowrap;
   font-family:'Barlow Condensed';font-weight:700;font-size:13.5px;letter-spacing:.05em;text-transform:uppercase;box-shadow:0 4px 16px rgba(255,90,77,.3);}
@@ -367,6 +363,33 @@ button.fsnapitem:hover{border-color:var(--green);transform:translateY(-1px);}
 @media (prefers-reduced-motion: no-preference){.room,.pulsecard,.presp,.sheet{animation:rise .4s ease both;}}
 @media(max-width:860px){.rooms{grid-template-columns:repeat(2,1fr);}.room.s2,.room.s3{grid-column:span 1;}.room.feat{grid-column:span 2;}.moods{grid-template-columns:1fr 1fr;}.fund .in{grid-template-columns:1fr;}}
 @media(max-width:480px){.rooms{grid-template-columns:1fr;}.room.s2,.room.s3,.room.feat{grid-column:span 1;}.greet h1{font-size:30px;}}
+
+/* mobile header + surfaces */
+@media(max-width:640px){
+  .hdr{padding:9px 12px;gap:8px;}
+  .lock img{height:36px;}
+  .hdr .right{flex-wrap:wrap;justify-content:flex-end;gap:7px;row-gap:6px;}
+  .ghost{padding:7px 9px;font-size:9px;letter-spacing:.06em;}
+  .langsel{padding:7px 8px;font-size:9px;}
+  .helpbtn{padding:8px 11px 7px;font-size:12.5px;gap:6px;}
+  .wrap{padding:0 16px;}
+  .overlay{padding:14px 10px;}
+  .sheet .sh{padding:16px 16px 6px;}
+  .sheet .sh h2{font-size:23px;}
+  .sbody{padding:8px 16px 20px;}
+  .pulsecard{padding:17px 16px;}
+  .strip{padding:14px;gap:12px;}
+  .bcrow{flex-wrap:wrap;}
+  .bcrow .bq{flex:1 1 100%;}
+  .bcrow .bopts{margin-left:auto;}
+  .dockhd{padding:14px 14px 10px;}
+  .dockprog{padding:11px 14px;}
+  .dockbody{padding:13px 14px 22px;}
+  .modal h3{padding:18px 16px 4px;}
+  .modal .ms{padding:0 16px 12px;}
+  .crow{padding:12px 16px;}
+  .fund .in{padding:28px 0 26px;}
+}
 
 /* ============================================================
    TWEAKS — expressive feel controls (palette / surface / charge)

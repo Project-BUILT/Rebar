@@ -111,11 +111,6 @@ function Header({ onHelp, onReset, showReset, punchCount, onPunch, onPM }){
     <div className="hdr">
       <div className="lock">
         <img src="assets/built-logo-light.png" alt="Project BUILT" />
-        <div className="div"></div>
-        <div>
-          <div className="wordmark"><span className="r">RE</span>BAR</div>
-          <div className="sub">{T("rb.sub")}</div>
-        </div>
       </div>
       <div className="right">
         <select className="langsel" value={window.I18N.lang} onChange={e=>window.I18N.setLang(e.target.value)} aria-label="Language">

@@ -317,8 +317,30 @@ a.ghostbtn{display:inline-flex;align-items:center;white-space:nowrap;}
   .phasetab{flex:1 1 45%;border-right:none;border-bottom:1px solid var(--line);}
   .fund .inner{grid-template-columns:1fr;}
 }
+@media(max-width:640px){
+  .hdr{padding:9px 12px;gap:8px;}
+  .hdr img.logo{height:36px;}
+  .hdr .divider,.hdr .product{display:none;}
+  .hdr .right{flex-wrap:wrap;justify-content:flex-end;gap:7px;row-gap:6px;}
+  .ghostbtn{padding:7px 9px;font-size:9.5px;letter-spacing:.08em;}
+  .langsel{padding:7px 24px 7px 8px;font-size:10px;}
+  .helpbtn{padding:8px 11px 7px;font-size:13px;gap:6px;}
+  .wrap{padding:0 16px;}
+  .intake{padding:30px 16px 56px;}
+  .cbody{max-height:52vh;}
+  .bub{max-width:92%;}
+  .inrow{flex-wrap:wrap;}
+  .inrow input{flex:1 1 100%;}
+  .overlay{padding:14px 10px;}
+  .sheet .sh{padding:16px 16px 8px;}
+  .sheet .sbody{padding:6px 16px 18px;}
+  .modal h3{padding:18px 16px 4px;}
+  .modal .ms{padding:0 16px 12px;}
+  .crow{padding:12px 16px;}
+  .planhead .inner{padding:20px 0 18px;}
+  .fund .inner{padding:30px 0 26px;}
+}
 @media(max-width:520px){
-  .hdr .product{display:none;}
   .cmprow,.cmphdr{grid-template-columns:1fr;gap:3px;}
   .cmprow .cell{padding-left:0;}
 }
