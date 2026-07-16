@@ -168,7 +168,7 @@
         : "");
 
     try {
-      const raw = await window.claude.complete({ messages: [{ role: "user", content: prompt }] });
+      const raw = await askModel(prompt);
       const parsed = extractJSON(raw);
       if (!parsed || !Array.isArray(parsed.items)) throw new Error("bad json");
       // normalize
@@ -219,6 +219,22 @@
     const workers = [];
     for (let w = 0; w < concurrency; w++) workers.push(worker());
     await Promise.all(workers);
+  }
+
+  // Uses the in-app helper inside the design preview; falls back to the
+  // Netlify serverless function (/.netlify/functions/chat) once deployed.
+  async function askModel(prompt) {
+    if (window.claude && typeof window.claude.complete === "function") {
+      return window.claude.complete({ messages: [{ role: "user", content: prompt }] });
+    }
+    const res = await fetch("/.netlify/functions/chat", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ prompt: prompt })
+    });
+    if (!res.ok) throw new Error("chat backend unavailable (" + res.status + ")");
+    const data = await res.json();
+    return data.text || "";
   }
 
   // ---- actionable links ----------------------------------------

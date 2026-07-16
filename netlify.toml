@@ -11,3 +11,10 @@
   to = "/rebar.html"
   status = 200
   force = true
+
+# Compass now lives on its own site at the subdomain
+[[redirects]]
+  from = "/compass"
+  to = "https://compass.getbuilt.org"
+  status = 301
+  force = true
